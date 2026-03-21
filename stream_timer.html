@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stream Timer</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link id="font-link" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -222,6 +223,96 @@ body {
   color: rgba(255,255,255,0.22);
   pointer-events: none; white-space: nowrap; z-index: 5;
 }
+
+/* ── Sound Drop ── */
+.sound-drop {
+  border: 2px dashed rgba(100,180,255,0.3);
+  border-radius: 10px; padding: 14px;
+  text-align: center; cursor: pointer;
+  color: rgba(255,255,255,0.4);
+  font-size: .78rem; letter-spacing: .08em;
+  transition: all .2s;
+}
+.sound-drop:hover { border-color: rgba(100,180,255,0.7); color: #fff; }
+.sound-drop.has-file { border-color: rgba(100,255,150,0.5); color: rgba(100,255,150,0.8); }
+
+/* ── Chat Overlay ── */
+#chat-overlay {
+  position: fixed; right: 24px; top: 50%; transform: translateY(-50%);
+  width: 300px; max-height: 70vh;
+  display: flex; flex-direction: column; gap: 0;
+  z-index: 20; pointer-events: none;
+  opacity: 0; transition: opacity .4s;
+}
+#chat-overlay.visible { opacity: 1; }
+#chat-header {
+  font-size: .6rem; letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(255,255,255,0.35); padding: 0 4px 6px;
+}
+#chat-messages {
+  display: flex; flex-direction: column; gap: 6px;
+  overflow: hidden;
+}
+.chat-msg {
+  background: rgba(10,10,20,0.72);
+  backdrop-filter: blur(6px);
+  border-left: 2px solid var(--uc, #4af);
+  border-radius: 0 8px 8px 0;
+  padding: 6px 10px;
+  font-size: .78rem; line-height: 1.4;
+  animation: slideIn .3s ease;
+}
+.chat-user { font-weight: 700; color: var(--uc, #4af); }
+.chat-text { color: rgba(255,255,255,0.85); }
+@keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:none; } }
+
+/* ── Remote Panel ── */
+#remote-panel {
+  display: none; position: fixed; inset: 0;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(10px);
+  z-index: 200;
+}
+#remote-panel.open { display: flex; }
+#remote-box {
+  background: rgba(12,12,22,0.97);
+  border: 1px solid rgba(100,180,255,0.3);
+  border-radius: 16px; padding: 32px 36px;
+  display: flex; flex-direction: column; gap: 16px;
+  align-items: center; min-width: 300px;
+}
+#remote-box h2 { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; color:#fff; letter-spacing:.1em; }
+#qr-wrap { background:#fff; padding:10px; border-radius:10px; }
+#remote-url { font-size:.65rem; color:rgba(255,255,255,0.4); text-align:center; word-break:break-all; max-width:260px; }
+#remote-close-btn {
+  padding: 10px 24px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px; color: #fff;
+  font-family:'Space Mono',monospace; font-size:.8rem;
+  cursor: pointer;
+}
+
+/* ── Controller Page ── */
+#controller-page {
+  display: none; position: fixed; inset: 0;
+  flex-direction: column; align-items: center; justify-content: center;
+  background: #0a0a14; z-index: 300; gap: 20px;
+}
+#controller-page.open { display: flex; }
+.ctrl-btn {
+  width: 200px; height: 64px;
+  border-radius: 14px; border: 1px solid rgba(100,180,255,0.3);
+  background: rgba(255,255,255,0.06);
+  color: #fff; font-family:'Bebas Neue',sans-serif;
+  font-size: 1.5rem; letter-spacing:.1em; cursor: pointer;
+  transition: background .15s, transform .1s;
+}
+.ctrl-btn:active { transform: scale(.95); background: rgba(100,180,255,0.25); }
+.ctrl-btn.red { border-color: rgba(255,80,80,0.4); }
+.ctrl-btn.red:active { background: rgba(255,80,80,0.25); }
+#ctrl-display { font-family:'Bebas Neue',sans-serif; font-size:4rem; color:#fff; letter-spacing:.05em; }
+#ctrl-status { font-size:.7rem; letter-spacing:.2em; color:rgba(255,255,255,0.3); text-transform:uppercase; }
 </style>
 </head>
 <body>
@@ -236,6 +327,32 @@ body {
   <div id="bar-wrap"><div id="bar"></div></div>
 </div>
 
+<!-- Chat Overlay -->
+<div id="chat-overlay">
+  <div id="chat-header">💬 Chat</div>
+  <div id="chat-messages"></div>
+</div>
+
+<!-- Remote QR Panel -->
+<div id="remote-panel">
+  <div id="remote-box">
+    <h2>📱 Remote Control</h2>
+    <div id="qr-wrap"></div>
+    <div id="remote-url"></div>
+    <button id="remote-close-btn" onclick="closeRemote()">Schließen</button>
+  </div>
+</div>
+
+<!-- Controller Page (Handy) -->
+<div id="controller-page">
+  <div id="ctrl-status">Remote Controller</div>
+  <div id="ctrl-display">--:--</div>
+  <button class="ctrl-btn" onclick="ctrlSend('toggle')">▶ / ⏸</button>
+  <button class="ctrl-btn" onclick="ctrlSend('reset')">↺ RESET</button>
+  <button class="ctrl-btn red" onclick="ctrlSend('stop_all')">⏹ STOP</button>
+</div>
+
+<!-- Settings Panel -->
 <div id="edit-panel">
   <div id="panel-box">
     <h2>⚙ Timer Einstellungen</h2>
@@ -281,27 +398,75 @@ body {
       </div>
     </div>
 
+    <div class="section-title">🎨 Timer Farbe & Glow</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <div class="row" style="flex:1;min-width:100px;">
+        <label>Timer Farbe</label>
+        <input type="color" id="cfg-timer-color" value="#ffffff" style="width:100%;height:38px;border:1px solid rgba(100,180,255,0.3);border-radius:8px;cursor:pointer;padding:2px;">
+      </div>
+      <div class="row" style="flex:1;min-width:100px;">
+        <label>Glow Farbe</label>
+        <input type="color" id="cfg-glow-color" value="#64b4ff" style="width:100%;height:38px;border:1px solid rgba(100,180,255,0.3);border-radius:8px;cursor:pointer;padding:2px;">
+      </div>
+    </div>
+    <div class="range-row">
+      <label>Glow Stärke</label>
+      <input type="range" id="cfg-glow-strength" min="0" max="10" value="5">
+    </div>
+
+    <div class="section-title">✍️ Custom Font</div>
+    <div class="row">
+      <label>Google Font Name (z.B. Orbitron, Audiowide)</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="cfg-font-name" placeholder="Bebas Neue" style="flex:1;">
+        <button class="small-btn blue" onclick="previewFont()">Vorschau</button>
+      </div>
+    </div>
+    <div class="row">
+      <label>Gilt für</label>
+      <select id="cfg-font-target">
+        <option value="display">Timer-Zahl</option>
+        <option value="label">Label</option>
+        <option value="both">Beides</option>
+      </select>
+    </div>
+
+    <div class="section-title">🔊 Sound bei Finish</div>
+    <div class="sound-drop" id="finish-sound-drop" onclick="document.getElementById('finish-sound-file').click()">
+      <div id="finish-sound-text">📂 Audiodatei auswählen (MP3, WAV, OGG)</div>
+    </div>
+    <input type="file" id="finish-sound-file" accept="audio/*" style="display:none;">
+    <div id="finish-sound-controls" style="display:none;gap:8px;align-items:center;flex-wrap:wrap;">
+      <button class="small-btn blue" onclick="testFinishSound()">▶ Test</button>
+      <button class="small-btn" onclick="removeFinishSound()">🗑 Entfernen</button>
+      <span id="finish-sound-name" style="font-size:.7rem;color:rgba(255,255,255,0.4);"></span>
+    </div>
+    <div class="range-row" id="finish-sound-vol-row" style="display:none;">
+      <label>Lautstärke</label>
+      <input type="range" id="cfg-finish-sound-vol" min="0" max="100" value="80">
+    </div>
+
     <div class="section-title">🎆 Finish-Effekt bei 00:00</div>
     <div class="effect-grid" id="finish-effect-grid">
       <button class="effect-btn" data-effect="none">❌ Kein Effekt</button>
       <button class="effect-btn active" data-effect="confetti">🎊 Konfetti</button>
-      <button class="effect-btn" data-effect="flash">⚡ Blitz / Flash</button>
+      <button class="effect-btn" data-effect="flash">⚡ Blitz</button>
       <button class="effect-btn" data-effect="wave">🌊 Wellen</button>
-      <button class="effect-btn" data-effect="particles">✨ Partikel-Explosion</button>
+      <button class="effect-btn" data-effect="particles">✨ Partikel</button>
       <button class="effect-btn" data-effect="fire">🔥 Feuer</button>
     </div>
 
-    <div class="section-title">🌌 Hintergrund-Effekt (während Timer)</div>
+    <div class="section-title">🌌 Hintergrund-Effekt</div>
     <div class="effect-grid" id="bg-effect-grid">
       <button class="effect-btn active" data-bgeffect="none">❌ Keiner</button>
       <button class="effect-btn" data-bgeffect="stars">⭐ Sterne</button>
       <button class="effect-btn" data-bgeffect="bubbles">🫧 Blasen</button>
       <button class="effect-btn" data-bgeffect="matrix">💚 Matrix</button>
-      <button class="effect-btn" data-bgeffect="neon">🌈 Neon-Wellen</button>
+      <button class="effect-btn" data-bgeffect="neon">🌈 Neon</button>
       <button class="effect-btn" data-bgeffect="snow">❄️ Schnee</button>
     </div>
     <div class="range-row">
-      <label>Intensität Hintergrund</label>
+      <label>Intensität</label>
       <input type="range" id="cfg-bg-intensity" min="1" max="10" value="5">
     </div>
 
@@ -309,16 +474,45 @@ body {
     <div id="video-drop" onclick="document.getElementById('video-file').click()">
       <div id="video-drop-text">📂 Klicken zum Video auswählen<br><span style="font-size:.65rem;opacity:.6;">MP4, WebM, MOV</span></div>
     </div>
-    <input type="file" id="video-file" accept="video/*">
+    <input type="file" id="video-file" accept="video/*" style="display:none;">
     <div id="video-controls" style="display:none;">
       <button class="small-btn blue" id="btn-video-toggle">▶ Aktivieren</button>
       <button class="small-btn" id="btn-video-remove">🗑 Entfernen</button>
-      <span id="video-name" style="font-size:.7rem;color:rgba(255,255,255,0.4);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      <span id="video-name" style="font-size:.7rem;color:rgba(255,255,255,0.4);"></span>
     </div>
     <div class="range-row" id="video-opacity-row" style="display:none;">
       <label>Video Deckkraft</label>
       <input type="range" id="cfg-video-opacity" min="0" max="100" value="100">
     </div>
+
+    <div class="section-title">💬 Twitch Chat Overlay</div>
+    <div class="row">
+      <label>Kanal (leer = kein Chat)</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="cfg-twitch-channel" placeholder="kanalname" style="flex:1;">
+        <button class="small-btn blue" onclick="connectChat()">Verbinden</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <div class="row" style="flex:1;">
+        <label>Max. Msgs</label>
+        <input type="number" id="cfg-chat-max" value="6" min="1" max="20">
+      </div>
+      <div class="row" style="flex:1;">
+        <label>Dauer (Sek)</label>
+        <input type="number" id="cfg-chat-duration" value="12" min="3" max="60">
+      </div>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="cfg-chat-visible">
+      <span>Chat-Overlay anzeigen</span>
+    </div>
+
+    <div class="section-title">📱 Remote Control</div>
+    <div style="font-size:.75rem;color:rgba(255,255,255,0.4);line-height:1.6;">
+      Handy scannt QR-Code → öffnet Controller im Browser. Funktioniert wenn beide im selben Chrome geöffnet sind.
+    </div>
+    <button class="small-btn blue" style="width:100%;padding:10px;" onclick="openRemote()">📱 QR-Code anzeigen</button>
 
     <button id="save-btn">✓ Übernehmen &amp; Schließen</button>
   </div>
@@ -327,7 +521,9 @@ body {
 <div id="hint"># = Einstellungen &nbsp;|&nbsp; P = Start/Pause &nbsp;|&nbsp; R = Reset</div>
 
 <script>
-// ── State ──
+// ════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════
 let totalSeconds = 300, remaining = 300, running = false, interval = null;
 let mode = 'countdown', countupSecs = 0;
 let showBar = true, autoFinish = false, editOpen = false;
@@ -336,7 +532,12 @@ let finishText = '', finishEffect = 'confetti';
 let bgEffect = 'none', bgIntensity = 5;
 let videoActive = false, videoOpacity = 100, videoURL = null;
 let finishedOnce = false;
+let timerColor = '#ffffff', glowColor = '#64b4ff', glowStrength = 5;
+let finishSoundURL = null, finishSoundEl = null;
 
+// ════════════════════════════════════════════════════════════
+//  DOM REFS
+// ════════════════════════════════════════════════════════════
 const display  = document.getElementById('display');
 const labelEl  = document.getElementById('label');
 const barWrap  = document.getElementById('bar-wrap');
@@ -355,7 +556,9 @@ function resizeCanvases() {
 window.addEventListener('resize', resizeCanvases);
 resizeCanvases();
 
-// ── Timer ──
+// ════════════════════════════════════════════════════════════
+//  TIMER CORE
+// ════════════════════════════════════════════════════════════
 function fmt(secs) {
   secs = Math.max(0, secs);
   const h = Math.floor(secs/3600), m = Math.floor((secs%3600)/60), s = secs%60;
@@ -363,9 +566,22 @@ function fmt(secs) {
 }
 function pad(n) { return String(n).padStart(2,'0'); }
 
+function applyTimerColor() {
+  const g = glowStrength;
+  display.style.color = timerColor;
+  if (g === 0) {
+    display.style.textShadow = 'none';
+  } else {
+    display.style.textShadow =
+      `0 0 ${g*4}px ${timerColor}, 0 0 ${g*12}px ${glowColor}99, 0 0 ${g*24}px ${glowColor}44`;
+  }
+}
+
 function render() {
   const val = mode === 'countdown' ? remaining : countupSecs;
-  if (!(mode === 'countdown' && remaining === 0 && finishText)) display.textContent = fmt(val);
+  if (!(mode === 'countdown' && remaining === 0 && finishText)) {
+    display.textContent = fmt(val);
+  }
   if (mode === 'countdown' && showBar && totalSeconds > 0) {
     barWrap.classList.add('visible');
     const pct = (remaining / totalSeconds) * 100;
@@ -388,28 +604,196 @@ function render() {
 function tick() {
   if (mode === 'countdown') {
     if (remaining > 0) remaining--;
-    if (remaining === 0 && !finishedOnce) { finishedOnce = true; triggerFinishEffect(); }
+    if (remaining === 0 && !finishedOnce) {
+      finishedOnce = true;
+      triggerFinishEffect();
+      playFinishSound();
+    }
     if (remaining === 0 && autoFinish) stop();
-  } else { countupSecs++; }
+  } else {
+    countupSecs++;
+  }
   render();
 }
 
-function start() {
-  if (running || (mode === 'countdown' && remaining === 0)) return;
-  running = true; interval = setInterval(tick, 1000); render();
-}
-function pause() { if (!running) return; running = false; clearInterval(interval); render(); }
-function stop()  { running = false; clearInterval(interval); render(); }
-function toggle(){ if (running) pause(); else start(); }
-function reset() { stop(); remaining = totalSeconds; countupSecs = 0; finishedOnce = false; clearFinishFX(); render(); }
+function start()  { if (running || (mode==='countdown' && remaining===0)) return; running=true; interval=setInterval(tick,1000); render(); }
+function pause()  { if (!running) return; running=false; clearInterval(interval); render(); }
+function stop()   { running=false; clearInterval(interval); render(); }
+function toggle() { if (running) pause(); else start(); }
+function reset()  { stop(); remaining=totalSeconds; countupSecs=0; finishedOnce=false; clearFinishFX(); render(); }
 
-// ── Background Effects ──
+// ════════════════════════════════════════════════════════════
+//  TIMER COLOR & GLOW
+// ════════════════════════════════════════════════════════════
+document.getElementById('cfg-timer-color').addEventListener('input', function() { timerColor = this.value; applyTimerColor(); });
+document.getElementById('cfg-glow-color').addEventListener('input',  function() { glowColor  = this.value; applyTimerColor(); });
+document.getElementById('cfg-glow-strength').addEventListener('input', function() { glowStrength = parseInt(this.value); applyTimerColor(); });
+
+// ════════════════════════════════════════════════════════════
+//  CUSTOM FONT
+// ════════════════════════════════════════════════════════════
+function previewFont() {
+  const name = document.getElementById('cfg-font-name').value.trim();
+  if (!name) return;
+  const tgt = document.getElementById('cfg-font-target').value;
+  const link = document.getElementById('font-link');
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g,'+')}:wght@400;700&display=swap`;
+  setTimeout(() => {
+    if (tgt === 'display' || tgt === 'both') display.style.fontFamily = `'${name}', sans-serif`;
+    if (tgt === 'label'   || tgt === 'both') labelEl.style.fontFamily = `'${name}', monospace`;
+  }, 700);
+}
+
+// ════════════════════════════════════════════════════════════
+//  FINISH SOUND
+// ════════════════════════════════════════════════════════════
+document.getElementById('finish-sound-file').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  if (finishSoundURL) URL.revokeObjectURL(finishSoundURL);
+  finishSoundURL = URL.createObjectURL(file);
+  finishSoundEl  = new Audio(finishSoundURL);
+  document.getElementById('finish-sound-drop').classList.add('has-file');
+  document.getElementById('finish-sound-text').textContent = '✅ ' + file.name;
+  document.getElementById('finish-sound-name').textContent = file.name;
+  document.getElementById('finish-sound-controls').style.display = 'flex';
+  document.getElementById('finish-sound-vol-row').style.display  = '';
+});
+
+function testFinishSound() {
+  if (!finishSoundEl) return;
+  finishSoundEl.currentTime = 0;
+  finishSoundEl.volume = (parseInt(document.getElementById('cfg-finish-sound-vol').value) || 80) / 100;
+  finishSoundEl.play().catch(() => {});
+}
+
+function removeFinishSound() {
+  if (finishSoundURL) URL.revokeObjectURL(finishSoundURL);
+  finishSoundURL = null; finishSoundEl = null;
+  document.getElementById('finish-sound-drop').classList.remove('has-file');
+  document.getElementById('finish-sound-text').innerHTML = '📂 Audiodatei auswählen (MP3, WAV, OGG)';
+  document.getElementById('finish-sound-controls').style.display = 'none';
+  document.getElementById('finish-sound-vol-row').style.display  = 'none';
+}
+
+function playFinishSound() {
+  if (!finishSoundEl) return;
+  finishSoundEl.currentTime = 0;
+  finishSoundEl.volume = (parseInt(document.getElementById('cfg-finish-sound-vol').value) || 80) / 100;
+  finishSoundEl.play().catch(() => {});
+}
+
+// ════════════════════════════════════════════════════════════
+//  CHAT OVERLAY (Twitch IRC via WebSocket)
+// ════════════════════════════════════════════════════════════
+let chatWS = null;
+const chatMsgsEl = document.getElementById('chat-messages');
+const chatOverlayEl = document.getElementById('chat-overlay');
+const CHAT_COLORS = ['#ff7f50','#9acd32','#00ff7f','#1e90ff','#da70d6','#ff69b4','#ffa500','#7fffd4'];
+
+function userColor(name) {
+  let h = 0;
+  for (let c of name) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+  return CHAT_COLORS[h % CHAT_COLORS.length];
+}
+
+function connectChat() {
+  const ch = document.getElementById('cfg-twitch-channel').value.trim().toLowerCase();
+  if (!ch) return;
+  if (chatWS) { chatWS.close(); chatWS = null; }
+  chatWS = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+  chatWS.onopen = () => {
+    chatWS.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
+    chatWS.send('PASS oauth:justinfan12345');
+    chatWS.send('NICK justinfan12345');
+    chatWS.send('JOIN #' + ch);
+  };
+  chatWS.onmessage = e => {
+    if (e.data.startsWith('PING')) { chatWS.send('PONG :tmi.twitch.tv'); return; }
+    if (!e.data.includes('PRIVMSG')) return;
+    const tagMatch  = e.data.match(/display-name=([^;]*)/);
+    const nickMatch = e.data.match(/:([^!]+)!/);
+    const msgMatch  = e.data.match(/PRIVMSG #\S+ :(.+)/);
+    if (!msgMatch) return;
+    const user = (tagMatch && tagMatch[1]) || (nickMatch && nickMatch[1]) || 'user';
+    addChatMsg(user, msgMatch[1].trim());
+  };
+}
+
+function addChatMsg(user, text) {
+  const max = parseInt(document.getElementById('cfg-chat-max').value) || 6;
+  const dur = parseInt(document.getElementById('cfg-chat-duration').value) || 12;
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg';
+  msg.style.setProperty('--uc', userColor(user));
+  msg.innerHTML = `<span class="chat-user">${esc(user)}</span> <span class="chat-text">${esc(text)}</span>`;
+  chatMsgsEl.appendChild(msg);
+  while (chatMsgsEl.children.length > max) chatMsgsEl.removeChild(chatMsgsEl.firstChild);
+  setTimeout(() => { msg.style.transition='opacity .5s'; msg.style.opacity='0'; setTimeout(()=>msg.remove(),500); }, dur*1000);
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+document.getElementById('cfg-chat-visible').addEventListener('change', function() {
+  chatOverlayEl.classList.toggle('visible', this.checked);
+});
+
+// ════════════════════════════════════════════════════════════
+//  REMOTE CONTROL (BroadcastChannel)
+// ════════════════════════════════════════════════════════════
+let bc = null;
+
+function initBC() {
+  if (!window.BroadcastChannel) return;
+  bc = new BroadcastChannel('devloot_timer');
+  bc.onmessage = e => {
+    if (e.data === 'toggle')   toggle();
+    if (e.data === 'reset')    reset();
+    if (e.data === 'stop_all') { stop(); clearFinishFX(); }
+    if (e.data === 'ping')     bc.postMessage({ type:'state', running, remaining, countupSecs, mode });
+  };
+}
+
+function ctrlSend(cmd) { if (bc) bc.postMessage(cmd); }
+
+function openRemote() {
+  document.getElementById('remote-panel').classList.add('open');
+  const url = location.href.split('#')[0] + '#remote';
+  document.getElementById('remote-url').textContent = url;
+  const wrap = document.getElementById('qr-wrap');
+  wrap.innerHTML = '';
+  try { new QRCode(wrap, { text: url, width:180, height:180, colorDark:'#000', colorLight:'#fff' }); }
+  catch(e) { wrap.textContent = url; }
+}
+function closeRemote() { document.getElementById('remote-panel').classList.remove('open'); }
+
+function checkRemoteMode() {
+  if (location.hash === '#remote') {
+    document.getElementById('controller-page').classList.add('open');
+    if (!window.BroadcastChannel) return;
+    bc = new BroadcastChannel('devloot_timer');
+    bc.onmessage = e => {
+      if (e.data && e.data.type === 'state') {
+        const val = e.data.mode === 'countdown' ? e.data.remaining : e.data.countupSecs;
+        document.getElementById('ctrl-display').textContent = fmt(val);
+        document.getElementById('ctrl-status').textContent  = e.data.running ? '▶ Läuft' : '⏸ Pausiert';
+      }
+    };
+    setInterval(() => { if (bc) bc.postMessage('ping'); }, 1000);
+  } else {
+    initBC();
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  BACKGROUND EFFECTS
+// ════════════════════════════════════════════════════════════
 let bgParticles = [], bgAnimFrame = null;
 
 function initBgEffect() {
   bgParticles = [];
   if (bgAnimFrame) cancelAnimationFrame(bgAnimFrame);
-  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+  bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
   if (bgEffect === 'none') return;
   const W = bgCanvas.width, H = bgCanvas.height;
   const count = bgIntensity * 15;
@@ -430,41 +814,37 @@ function initBgEffect() {
 
 function animateBg() {
   bgAnimFrame = requestAnimationFrame(animateBg);
-  const W = bgCanvas.width, H = bgCanvas.height;
-  const t = Date.now()/1000;
+  const W = bgCanvas.width, H = bgCanvas.height, t = Date.now()/1000;
   bgCtx.clearRect(0,0,W,H);
-
   if (bgEffect === 'stars') {
     bgParticles.forEach(p => {
       p.twinkle += 0.03;
       const a = (Math.sin(p.twinkle)+1)/2*0.8+0.1;
       bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      bgCtx.fillStyle = `rgba(255,255,255,${a})`; bgCtx.fill();
-      p.y -= 0.1; if (p.y < -5) { p.y = H+5; p.x = Math.random()*W; }
+      bgCtx.fillStyle=`rgba(255,255,255,${a})`; bgCtx.fill();
+      p.y -= 0.1; if (p.y<-5){p.y=H+5;p.x=Math.random()*W;}
     });
   } else if (bgEffect === 'bubbles') {
     bgParticles.forEach(p => {
       bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      bgCtx.strokeStyle = `rgba(150,220,255,${p.alpha})`; bgCtx.lineWidth=1.5; bgCtx.stroke();
-      bgCtx.beginPath(); bgCtx.arc(p.x-p.r*0.3,p.y-p.r*0.3,p.r*0.25,0,Math.PI*2);
-      bgCtx.fillStyle = `rgba(255,255,255,${p.alpha*0.8})`; bgCtx.fill();
+      bgCtx.strokeStyle=`rgba(150,220,255,${p.alpha})`; bgCtx.lineWidth=1.5; bgCtx.stroke();
       p.y -= p.speed*(bgIntensity*0.12); p.x += p.drift;
-      if (p.y < -p.r*2) { p.y=H+p.r; p.x=Math.random()*W; }
+      if (p.y<-p.r*2){p.y=H+p.r;p.x=Math.random()*W;}
     });
   } else if (bgEffect === 'matrix') {
     bgCtx.fillStyle='rgba(0,0,0,0.04)'; bgCtx.fillRect(0,0,W,H);
     bgCtx.font="14px 'Space Mono',monospace";
     bgParticles.forEach(p => {
-      const ch = String.fromCharCode(0x30A0+Math.random()*96);
-      bgCtx.fillStyle=`rgba(0,255,80,${0.08+bgIntensity*0.02})`; bgCtx.fillText(ch,p.x,p.y);
-      p.y += p.speed*(bgIntensity*0.25); if (p.y>H) p.y=-20;
+      bgCtx.fillStyle=`rgba(0,255,80,${0.08+bgIntensity*0.02})`;
+      bgCtx.fillText(String.fromCharCode(0x30A0+Math.random()*96),p.x,p.y);
+      p.y += p.speed*(bgIntensity*0.25); if(p.y>H)p.y=-20;
     });
   } else if (bgEffect === 'neon') {
     bgParticles.forEach(p => {
       p.offset += p.speed*bgIntensity*0.2;
       bgCtx.beginPath();
       for (let x=0;x<W;x+=4) {
-        const y = H/2+Math.sin(x*0.01+p.offset)*p.amp+Math.cos(x*0.007+p.offset*0.7)*p.amp*0.5;
+        const y=H/2+Math.sin(x*0.01+p.offset)*p.amp+Math.cos(x*0.007+p.offset*0.7)*p.amp*0.5;
         x===0?bgCtx.moveTo(x,y):bgCtx.lineTo(x,y);
       }
       bgCtx.strokeStyle=`hsla(${p.hue+t*20},100%,60%,${p.alpha})`;
@@ -476,18 +856,20 @@ function animateBg() {
       bgCtx.fillStyle=`rgba(255,255,255,${p.alpha})`; bgCtx.fill();
       p.y += p.speed*(bgIntensity*0.12);
       p.x += p.drift+Math.sin(t+p.y*0.01)*0.3;
-      if (p.y>H+5){p.y=-5;p.x=Math.random()*W;}
+      if(p.y>H+5){p.y=-5;p.x=Math.random()*W;}
     });
   }
 }
 
-// ── Finish Effects ──
+// ════════════════════════════════════════════════════════════
+//  FINISH EFFECTS
+// ════════════════════════════════════════════════════════════
 let fxParticles = [], fxAnimFrame = null, fxRunning = false;
 
 function clearFinishFX() {
   fxRunning = false;
   if (fxAnimFrame) cancelAnimationFrame(fxAnimFrame);
-  fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+  fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
   fxParticles = [];
 }
 
@@ -498,205 +880,154 @@ function triggerFinishEffect() {
   const W = fxCanvas.width, H = fxCanvas.height;
 
   if (finishEffect === 'confetti') {
-    for (let i=0;i<220;i++) fxParticles.push({
-      x:Math.random()*W, y:-20-Math.random()*H*0.5,
-      vx:(Math.random()-0.5)*6, vy:Math.random()*4+2,
-      r:Math.random()*7+3, rot:Math.random()*Math.PI*2, rotV:(Math.random()-0.5)*0.15,
-      color:`hsl(${Math.random()*360},90%,60%)`,
-      shape:Math.random()>0.5?'rect':'circle', alpha:1
-    });
-    (function anim(){
-      fxCtx.clearRect(0,0,W,H); let alive=false;
-      fxParticles.forEach(p=>{
-        if(p.alpha<=0)return; alive=true;
-        p.x+=p.vx;p.y+=p.vy;p.vy+=0.12;p.vx*=0.99;p.rot+=p.rotV;p.alpha-=0.007;
-        fxCtx.save();fxCtx.globalAlpha=Math.max(0,p.alpha);fxCtx.translate(p.x,p.y);fxCtx.rotate(p.rot);
-        fxCtx.fillStyle=p.color;
-        if(p.shape==='rect')fxCtx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);
-        else{fxCtx.beginPath();fxCtx.arc(0,0,p.r/2,0,Math.PI*2);fxCtx.fill();}
-        fxCtx.restore();
-      });
-      fxCtx.globalAlpha=1;
-      if(alive)fxAnimFrame=requestAnimationFrame(anim);
-    })();
-
+    for (let i=0;i<220;i++) fxParticles.push({ x:Math.random()*W, y:-20-Math.random()*H*0.5, vx:(Math.random()-0.5)*6, vy:Math.random()*4+2, r:Math.random()*7+3, rot:Math.random()*Math.PI*2, rotV:(Math.random()-0.5)*0.15, color:`hsl(${Math.random()*360},90%,60%)`, shape:Math.random()>0.5?'rect':'circle', alpha:1 });
+    (function anim(){ fxCtx.clearRect(0,0,W,H); let alive=false; fxParticles.forEach(p=>{ if(p.alpha<=0)return; alive=true; p.x+=p.vx;p.y+=p.vy;p.vy+=0.12;p.vx*=0.99;p.rot+=p.rotV;p.alpha-=0.007; fxCtx.save();fxCtx.globalAlpha=Math.max(0,p.alpha);fxCtx.translate(p.x,p.y);fxCtx.rotate(p.rot);fxCtx.fillStyle=p.color; if(p.shape==='rect')fxCtx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);else{fxCtx.beginPath();fxCtx.arc(0,0,p.r/2,0,Math.PI*2);fxCtx.fill();}fxCtx.restore();}); fxCtx.globalAlpha=1; if(alive)fxAnimFrame=requestAnimationFrame(anim); })();
   } else if (finishEffect === 'flash') {
-    let alpha=1,flashes=0;
-    (function doFlash(){
-      fxCtx.clearRect(0,0,W,H);
-      fxCtx.fillStyle=`rgba(255,255,255,${alpha})`;fxCtx.fillRect(0,0,W,H);
-      alpha-=0.04;
-      if(alpha>0){fxAnimFrame=requestAnimationFrame(doFlash);}
-      else if(flashes<3){flashes++;alpha=0.6;setTimeout(()=>{fxAnimFrame=requestAnimationFrame(doFlash);},120);}
-      else{fxCtx.clearRect(0,0,W,H);}
-    })();
-
+    let alpha=1,flashes=0; (function doFlash(){ fxCtx.clearRect(0,0,W,H); fxCtx.fillStyle=`rgba(255,255,255,${alpha})`;fxCtx.fillRect(0,0,W,H); alpha-=0.04; if(alpha>0){fxAnimFrame=requestAnimationFrame(doFlash);}else if(flashes<3){flashes++;alpha=0.6;setTimeout(()=>{fxAnimFrame=requestAnimationFrame(doFlash);},120);}else{fxCtx.clearRect(0,0,W,H);} })();
   } else if (finishEffect === 'wave') {
-    let t=0;
-    (function doWave(){
-      fxCtx.clearRect(0,0,W,H);
-      for(let w=0;w<5;w++){
-        const prog=t-w*0.2; if(prog<0)continue;
-        const radius=prog*Math.max(W,H)*0.9;
-        const alpha=Math.max(0,0.6-prog*0.55);
-        fxCtx.beginPath();fxCtx.arc(W/2,H/2,radius,0,Math.PI*2);
-        fxCtx.strokeStyle=`hsla(${200+w*30},100%,70%,${alpha})`;
-        fxCtx.lineWidth=4-w*0.5;fxCtx.stroke();
-      }
-      t+=0.018;
-      if(t<2.2)fxAnimFrame=requestAnimationFrame(doWave);
-      else fxCtx.clearRect(0,0,W,H);
-    })();
-
+    let t=0; (function doWave(){ fxCtx.clearRect(0,0,W,H); for(let w=0;w<5;w++){const prog=t-w*0.2;if(prog<0)continue;const radius=prog*Math.max(W,H)*0.9;const alpha=Math.max(0,0.6-prog*0.55);fxCtx.beginPath();fxCtx.arc(W/2,H/2,radius,0,Math.PI*2);fxCtx.strokeStyle=`hsla(${200+w*30},100%,70%,${alpha})`;fxCtx.lineWidth=4-w*0.5;fxCtx.stroke();} t+=0.018; if(t<2.2)fxAnimFrame=requestAnimationFrame(doWave);else fxCtx.clearRect(0,0,W,H); })();
   } else if (finishEffect === 'particles') {
-    for(let i=0;i<180;i++){
-      const angle=Math.random()*Math.PI*2,speed=Math.random()*12+3;
-      fxParticles.push({x:W/2,y:H/2,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:Math.random()*5+2,color:`hsl(${Math.random()*360},100%,65%)`,alpha:1});
-    }
-    (function anim(){
-      fxCtx.clearRect(0,0,W,H);let alive=false;
-      fxParticles.forEach(p=>{
-        if(p.alpha<=0)return;alive=true;
-        p.x+=p.vx;p.y+=p.vy;p.vy+=0.2;p.vx*=0.98;p.alpha-=0.013;
-        fxCtx.globalAlpha=Math.max(0,p.alpha);
-        fxCtx.beginPath();fxCtx.arc(p.x,p.y,p.r,0,Math.PI*2);fxCtx.fillStyle=p.color;fxCtx.fill();
-      });
-      fxCtx.globalAlpha=1;
-      if(alive)fxAnimFrame=requestAnimationFrame(anim);
-      else fxCtx.clearRect(0,0,W,H);
-    })();
-
+    for(let i=0;i<180;i++){const angle=Math.random()*Math.PI*2,speed=Math.random()*12+3;fxParticles.push({x:W/2,y:H/2,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:Math.random()*5+2,color:`hsl(${Math.random()*360},100%,65%)`,alpha:1});}
+    (function anim(){ fxCtx.clearRect(0,0,W,H);let alive=false; fxParticles.forEach(p=>{if(p.alpha<=0)return;alive=true;p.x+=p.vx;p.y+=p.vy;p.vy+=0.2;p.vx*=0.98;p.alpha-=0.013;fxCtx.globalAlpha=Math.max(0,p.alpha);fxCtx.beginPath();fxCtx.arc(p.x,p.y,p.r,0,Math.PI*2);fxCtx.fillStyle=p.color;fxCtx.fill();}); fxCtx.globalAlpha=1; if(alive)fxAnimFrame=requestAnimationFrame(anim);else fxCtx.clearRect(0,0,W,H); })();
   } else if (finishEffect === 'fire') {
-    const GW=Math.ceil(W/8), GH=Math.ceil(H/8);
-    const grid=new Float32Array(GW*GH);
-    setTimeout(()=>{fxRunning=false;},4500);
-    (function doFire(){
-      for(let x=0;x<GW;x++)grid[(GH-1)*GW+x]=Math.random()>0.3?1:0;
-      for(let y=0;y<GH-1;y++)for(let x=0;x<GW;x++){
-        const bx=Math.min(GW-1,Math.max(0,x+(Math.random()*3|0)-1));
-        grid[y*GW+x]=grid[(y+1)*GW+bx]*(0.86+Math.random()*0.06);
-      }
-      fxCtx.clearRect(0,0,W,H);
-      for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){
-        const v=grid[y*GW+x]; if(v<0.05)continue;
-        fxCtx.fillStyle=`rgba(${Math.min(255,v*510)|0},${Math.max(0,v*255-80)|0},0,${v*0.85})`;
-        fxCtx.fillRect(x*8,y*8,9,9);
-      }
-      if(fxRunning)fxAnimFrame=requestAnimationFrame(doFire);
-      else fxCtx.clearRect(0,0,W,H);
-    })();
+    const GW=Math.ceil(W/8),GH=Math.ceil(H/8);const grid=new Float32Array(GW*GH);setTimeout(()=>{fxRunning=false;},4500);
+    (function doFire(){ for(let x=0;x<GW;x++)grid[(GH-1)*GW+x]=Math.random()>0.3?1:0; for(let y=0;y<GH-1;y++)for(let x=0;x<GW;x++){const bx=Math.min(GW-1,Math.max(0,x+(Math.random()*3|0)-1));grid[y*GW+x]=grid[(y+1)*GW+bx]*(0.86+Math.random()*0.06);} fxCtx.clearRect(0,0,W,H); for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){const v=grid[y*GW+x];if(v<0.05)continue;fxCtx.fillStyle=`rgba(${Math.min(255,v*510)|0},${Math.max(0,v*255-80)|0},0,${v*0.85})`;fxCtx.fillRect(x*8,y*8,9,9);} if(fxRunning)fxAnimFrame=requestAnimationFrame(doFire);else fxCtx.clearRect(0,0,W,H); })();
   }
 }
 
-// ── Video ──
-document.getElementById('video-file').addEventListener('change', function(){
-  const file=this.files[0]; if(!file)return;
-  if(videoURL)URL.revokeObjectURL(videoURL);
-  videoURL=URL.createObjectURL(file);
-  bgVideo.src=videoURL;
+// ════════════════════════════════════════════════════════════
+//  VIDEO BACKGROUND
+// ════════════════════════════════════════════════════════════
+document.getElementById('video-file').addEventListener('change', function() {
+  const file = this.files[0]; if (!file) return;
+  if (videoURL) URL.revokeObjectURL(videoURL);
+  videoURL = URL.createObjectURL(file);
+  bgVideo.src = videoURL;
   document.getElementById('video-drop').classList.add('has-video');
-  document.getElementById('video-drop-text').textContent='✅ '+file.name;
-  document.getElementById('video-controls').style.display='flex';
-  document.getElementById('video-opacity-row').style.display='';
-  document.getElementById('video-name').textContent=file.name;
+  document.getElementById('video-drop-text').textContent = '✅ ' + file.name;
+  document.getElementById('video-controls').style.display = 'flex';
+  document.getElementById('video-opacity-row').style.display = '';
+  document.getElementById('video-name').textContent = file.name;
 });
-
-document.getElementById('btn-video-toggle').addEventListener('click',()=>{
-  videoActive=!videoActive;
-  bgVideo.classList.toggle('active',videoActive);
-  bgVideo.style.opacity=videoOpacity/100;
-  if(videoActive)bgVideo.play();
-  document.getElementById('btn-video-toggle').textContent=videoActive?'⏸ Deaktivieren':'▶ Aktivieren';
+document.getElementById('btn-video-toggle').addEventListener('click', () => {
+  videoActive = !videoActive;
+  bgVideo.classList.toggle('active', videoActive);
+  bgVideo.style.opacity = videoOpacity/100;
+  if (videoActive) bgVideo.play();
+  document.getElementById('btn-video-toggle').textContent = videoActive ? '⏸ Deaktivieren' : '▶ Aktivieren';
 });
-
-document.getElementById('btn-video-remove').addEventListener('click',()=>{
-  videoActive=false; bgVideo.classList.remove('active'); bgVideo.src='';
-  if(videoURL){URL.revokeObjectURL(videoURL);videoURL=null;}
+document.getElementById('btn-video-remove').addEventListener('click', () => {
+  videoActive = false; bgVideo.classList.remove('active'); bgVideo.src='';
+  if (videoURL) { URL.revokeObjectURL(videoURL); videoURL=null; }
   document.getElementById('video-drop').classList.remove('has-video');
   document.getElementById('video-drop-text').innerHTML='📂 Klicken zum Video auswählen<br><span style="font-size:.65rem;opacity:.6;">MP4, WebM, MOV</span>';
   document.getElementById('video-controls').style.display='none';
   document.getElementById('video-opacity-row').style.display='none';
 });
-
-document.getElementById('cfg-video-opacity').addEventListener('input',function(){
-  videoOpacity=parseInt(this.value);
-  bgVideo.style.opacity=videoOpacity/100;
+document.getElementById('cfg-video-opacity').addEventListener('input', function() {
+  videoOpacity = parseInt(this.value); bgVideo.style.opacity = videoOpacity/100;
 });
 
-// ── Edit Panel ──
-document.getElementById('finish-effect-grid').addEventListener('click',e=>{
-  const btn=e.target.closest('.effect-btn'); if(!btn)return;
-  document.querySelectorAll('#finish-effect-grid .effect-btn').forEach(b=>b.classList.remove('active'));
+// ════════════════════════════════════════════════════════════
+//  SETTINGS PANEL
+// ════════════════════════════════════════════════════════════
+document.getElementById('finish-effect-grid').addEventListener('click', e => {
+  const btn = e.target.closest('.effect-btn'); if (!btn) return;
+  document.querySelectorAll('#finish-effect-grid .effect-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 });
-document.getElementById('bg-effect-grid').addEventListener('click',e=>{
-  const btn=e.target.closest('.effect-btn'); if(!btn)return;
-  document.querySelectorAll('#bg-effect-grid .effect-btn').forEach(b=>b.classList.remove('active'));
+document.getElementById('bg-effect-grid').addEventListener('click', e => {
+  const btn = e.target.closest('.effect-btn'); if (!btn) return;
+  document.querySelectorAll('#bg-effect-grid .effect-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 });
 
-function openEdit(){
-  editOpen=true; if(running)pause();
-  const h=Math.floor(totalSeconds/3600),m=Math.floor((totalSeconds%3600)/60),s=totalSeconds%60;
-  document.getElementById('cfg-h').value=h;
-  document.getElementById('cfg-m').value=m;
-  document.getElementById('cfg-s').value=s;
-  document.getElementById('cfg-label').value=labelEl.textContent;
-  document.getElementById('cfg-mode').value=mode;
-  document.getElementById('cfg-bar').checked=showBar;
-  document.getElementById('cfg-autofinish').checked=autoFinish;
-  document.getElementById('cfg-finish-text').value=finishText;
-  document.getElementById('cfg-bar-color').value=barColor1;
-  document.getElementById('cfg-bar-color2').value=barColor2;
-  document.getElementById('cfg-bg-intensity').value=bgIntensity;
-  document.getElementById('cfg-video-opacity').value=videoOpacity;
-  document.querySelectorAll('#finish-effect-grid .effect-btn').forEach(b=>b.classList.toggle('active',b.dataset.effect===finishEffect));
-  document.querySelectorAll('#bg-effect-grid .effect-btn').forEach(b=>b.classList.toggle('active',b.dataset.bgeffect===bgEffect));
+function openEdit() {
+  editOpen = true;
+  if (running) pause();
+  const h=Math.floor(totalSeconds/3600), m=Math.floor((totalSeconds%3600)/60), s=totalSeconds%60;
+  document.getElementById('cfg-h').value = h;
+  document.getElementById('cfg-m').value = m;
+  document.getElementById('cfg-s').value = s;
+  document.getElementById('cfg-label').value       = labelEl.textContent;
+  document.getElementById('cfg-mode').value        = mode;
+  document.getElementById('cfg-bar').checked       = showBar;
+  document.getElementById('cfg-autofinish').checked = autoFinish;
+  document.getElementById('cfg-finish-text').value = finishText;
+  document.getElementById('cfg-bar-color').value   = barColor1;
+  document.getElementById('cfg-bar-color2').value  = barColor2;
+  document.getElementById('cfg-bg-intensity').value = bgIntensity;
+  document.getElementById('cfg-video-opacity').value = videoOpacity;
+  document.getElementById('cfg-timer-color').value  = timerColor;
+  document.getElementById('cfg-glow-color').value   = glowColor;
+  document.getElementById('cfg-glow-strength').value = glowStrength;
+  document.querySelectorAll('#finish-effect-grid .effect-btn').forEach(b => b.classList.toggle('active', b.dataset.effect === finishEffect));
+  document.querySelectorAll('#bg-effect-grid .effect-btn').forEach(b => b.classList.toggle('active', b.dataset.bgeffect === bgEffect));
   panel.classList.add('open');
 }
 
-function closeEdit(){
-  editOpen=false; panel.classList.remove('open');
+function closeEdit() {
+  editOpen = false;
+  panel.classList.remove('open');
 }
 
-document.getElementById('save-btn').addEventListener('click',()=>{
-  const h=parseInt(document.getElementById('cfg-h').value)||0;
-  const m=parseInt(document.getElementById('cfg-m').value)||0;
-  const s=parseInt(document.getElementById('cfg-s').value)||0;
-  totalSeconds=h*3600+m*60+s; remaining=totalSeconds; countupSecs=0; finishedOnce=false;
+document.getElementById('save-btn').addEventListener('click', () => {
+  const h = parseInt(document.getElementById('cfg-h').value)||0;
+  const m = parseInt(document.getElementById('cfg-m').value)||0;
+  const s = parseInt(document.getElementById('cfg-s').value)||0;
+  totalSeconds = h*3600+m*60+s; remaining = totalSeconds; countupSecs = 0; finishedOnce = false;
 
-  const lbl=document.getElementById('cfg-label').value.trim();
-  labelEl.textContent=lbl; labelEl.classList.toggle('visible',lbl.length>0);
-  mode=document.getElementById('cfg-mode').value;
-  showBar=document.getElementById('cfg-bar').checked;
-  autoFinish=document.getElementById('cfg-autofinish').checked;
-  finishText=document.getElementById('cfg-finish-text').value.trim();
-  barColor1=document.getElementById('cfg-bar-color').value;
-  barColor2=document.getElementById('cfg-bar-color2').value;
-  bgIntensity=parseInt(document.getElementById('cfg-bg-intensity').value);
+  const lbl = document.getElementById('cfg-label').value.trim();
+  labelEl.textContent = lbl;
+  labelEl.classList.toggle('visible', lbl.length > 0);
 
-  const activeBg=document.querySelector('#bg-effect-grid .effect-btn.active');
-  const newBg=activeBg?activeBg.dataset.bgeffect:'none';
-  if(newBg!==bgEffect){bgEffect=newBg;initBgEffect();}
+  mode        = document.getElementById('cfg-mode').value;
+  showBar     = document.getElementById('cfg-bar').checked;
+  autoFinish  = document.getElementById('cfg-autofinish').checked;
+  finishText  = document.getElementById('cfg-finish-text').value.trim();
+  barColor1   = document.getElementById('cfg-bar-color').value;
+  barColor2   = document.getElementById('cfg-bar-color2').value;
+  bgIntensity = parseInt(document.getElementById('cfg-bg-intensity').value);
+  timerColor  = document.getElementById('cfg-timer-color').value;
+  glowColor   = document.getElementById('cfg-glow-color').value;
+  glowStrength = parseInt(document.getElementById('cfg-glow-strength').value);
 
-  const activeFx=document.querySelector('#finish-effect-grid .effect-btn.active');
-  finishEffect=activeFx?activeFx.dataset.effect:'none';
+  const activeBg = document.querySelector('#bg-effect-grid .effect-btn.active');
+  const newBg    = activeBg ? activeBg.dataset.bgeffect : 'none';
+  if (newBg !== bgEffect) { bgEffect = newBg; initBgEffect(); }
 
-  clearFinishFX(); render(); closeEdit();
+  const activeFx = document.querySelector('#finish-effect-grid .effect-btn.active');
+  finishEffect = activeFx ? activeFx.dataset.effect : 'none';
+
+  // font
+  const fontName = document.getElementById('cfg-font-name').value.trim();
+  if (fontName) previewFont();
+
+  applyTimerColor();
+  clearFinishFX();
+  render();
+  closeEdit();
 });
 
-panel.addEventListener('click',e=>{ if(e.target===panel)closeEdit(); });
+panel.addEventListener('click', e => { if (e.target === panel) closeEdit(); });
 
-// ── Keyboard ──
-document.addEventListener('keydown',e=>{
-  const tag=document.activeElement.tagName;
-  const typing=tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';
-  if(e.key==='#'){e.preventDefault();if(editOpen)closeEdit();else openEdit();return;}
-  if(typing)return;
-  if(e.key==='p'||e.key==='P'){e.preventDefault();toggle();}
-  if(e.key==='r'||e.key==='R'){e.preventDefault();reset();}
+// ════════════════════════════════════════════════════════════
+//  KEYBOARD
+// ════════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName;
+  const typing = tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT';
+  if (e.key === '#') { e.preventDefault(); if (editOpen) closeEdit(); else openEdit(); return; }
+  if (typing) return;
+  if (e.key==='p'||e.key==='P') { e.preventDefault(); toggle(); }
+  if (e.key==='r'||e.key==='R') { e.preventDefault(); reset(); }
 });
 
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+applyTimerColor();
+checkRemoteMode();
 render();
 </script>
 </body>
