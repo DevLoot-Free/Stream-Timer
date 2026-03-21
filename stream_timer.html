@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stream Timer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: transparent;
+  width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  font-family: 'Space Mono', monospace;
+}
+
+#bg-video {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  display: none;
+}
+#bg-video.active { display: block; }
+
+#bg-canvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+#finish-canvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 50;
+  pointer-events: none;
+}
+
+#timer-wrap {
+  position: relative; z-index: 10;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+  user-select: none;
+}
+
+#label {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.1rem; font-weight: 700;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255,255,255,0.9), 0 0 30px rgba(120,200,255,0.6);
+  opacity: 0; transform: translateY(-6px);
+  transition: opacity .4s, transform .4s;
+}
+#label.visible { opacity: 1; transform: translateY(0); }
+
+#display {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(6rem, 20vw, 12rem);
+  line-height: 1; letter-spacing: 0.04em;
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 60px rgba(100,180,255,0.7), 0 0 120px rgba(80,140,255,0.4);
+  transition: color .3s, text-shadow .3s;
+  cursor: default;
+}
+#display.running { animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse {
+  0%,100% { text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 60px rgba(100,180,255,.7), 0 0 120px rgba(80,140,255,.4); }
+  50%      { text-shadow: 0 0 30px rgba(255,255,255,1), 0 0 80px rgba(100,180,255,.9), 0 0 160px rgba(80,140,255,.6); }
+}
+#display.finished {
+  animation: blink 0.6s step-start infinite;
+  color: #ff4444;
+  text-shadow: 0 0 20px rgba(255,60,60,1), 0 0 60px rgba(255,60,60,.7);
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+#bar-wrap {
+  width: 100%; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.15); overflow: hidden;
+  opacity: 0; transition: opacity .4s;
+}
+#bar-wrap.visible { opacity: 1; }
+#bar {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, #4af, #8af, #fff);
+  transition: width 1s linear, background .5s;
+  box-shadow: 0 0 10px #4af;
+}
+
+/* ── Edit Panel ── */
+#edit-panel {
+  display: none; position: fixed; inset: 0;
+  align-items: flex-start; justify-content: center;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  z-index: 100; overflow-y: auto; padding: 20px 0;
+}
+#edit-panel.open { display: flex; }
+
+#panel-box {
+  background: rgba(12,12,22,0.97);
+  border: 1px solid rgba(100,180,255,0.35);
+  border-radius: 16px;
+  padding: 32px 40px;
+  display: flex; flex-direction: column; gap: 18px;
+  min-width: 360px; max-width: 520px; width: 90%;
+  box-shadow: 0 0 60px rgba(80,150,255,0.2), 0 4px 40px rgba(0,0,0,0.7);
+  margin: auto;
+}
+#panel-box h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem; color: #fff;
+  letter-spacing: .1em; text-align: center;
+}
+
+.section-title {
+  font-size: .65rem; letter-spacing: .22em; text-transform: uppercase;
+  color: rgba(100,180,255,0.7);
+  border-bottom: 1px solid rgba(100,180,255,0.15);
+  padding-bottom: 6px; margin-top: 4px;
+}
+
+.row { display: flex; flex-direction: column; gap: 6px; }
+.row label { font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.row input[type=text],
+.row input[type=number],
+.row select {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(100,180,255,0.3);
+  border-radius: 8px; color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: .95rem; padding: 10px 14px;
+  outline: none; transition: border-color .2s;
+}
+.row input:focus, .row select:focus { border-color: rgba(100,180,255,0.8); }
+.row select option { background: #111; }
+
+.time-row { display: flex; gap: 10px; }
+.time-row .col { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.time-row .col label { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+.time-row .col input {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(100,180,255,0.3);
+  border-radius: 8px; color: #fff;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem; letter-spacing: .06em;
+  padding: 8px 10px; text-align: center;
+  outline: none; transition: border-color .2s; width: 100%;
+}
+.time-row .col input:focus { border-color: rgba(100,180,255,0.8); }
+
+.checkbox-row { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.checkbox-row input { width: 16px; height: 16px; accent-color: #4af; cursor: pointer; }
+.checkbox-row span { font-size: .82rem; color: rgba(255,255,255,0.6); }
+
+.effect-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.effect-btn {
+  padding: 10px 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  color: rgba(255,255,255,0.5);
+  font-family: 'Space Mono', monospace;
+  font-size: .75rem; letter-spacing: .06em;
+  cursor: pointer; transition: all .2s; text-align: center;
+}
+.effect-btn:hover { background: rgba(100,180,255,0.1); border-color: rgba(100,180,255,0.4); color: #fff; }
+.effect-btn.active {
+  background: rgba(100,180,255,0.2);
+  border-color: rgba(100,180,255,0.8);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(80,150,255,0.3);
+}
+
+#video-drop {
+  border: 2px dashed rgba(100,180,255,0.3);
+  border-radius: 10px; padding: 16px;
+  text-align: center; cursor: pointer;
+  transition: border-color .2s, background .2s;
+  color: rgba(255,255,255,0.4);
+  font-size: .78rem; letter-spacing: .08em;
+}
+#video-drop:hover { border-color: rgba(100,180,255,0.7); background: rgba(100,180,255,0.05); color: #fff; }
+#video-drop.has-video { border-color: rgba(100,255,150,0.5); color: rgba(100,255,150,0.8); }
+#video-file { display: none; }
+
+#video-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.small-btn {
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px; color: rgba(255,255,255,0.6);
+  font-family: 'Space Mono', monospace;
+  font-size: .7rem; cursor: pointer; transition: all .2s;
+}
+.small-btn:hover { background: rgba(255,80,80,0.2); border-color: rgba(255,80,80,0.5); color: #fff; }
+.small-btn.blue:hover { background: rgba(80,150,255,0.2); border-color: rgba(80,150,255,0.5); }
+
+.range-row { display: flex; flex-direction: column; gap: 6px; }
+.range-row label { font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.range-row input[type=range] { width: 100%; accent-color: #4af; }
+
+#save-btn {
+  margin-top: 4px; padding: 12px;
+  background: linear-gradient(135deg, rgba(60,140,255,0.7), rgba(60,80,220,0.7));
+  border: 1px solid rgba(100,180,255,0.5);
+  border-radius: 10px; color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700; font-size: .88rem;
+  letter-spacing: .12em; text-transform: uppercase;
+  cursor: pointer; transition: background .2s, box-shadow .2s;
+}
+#save-btn:hover { background: linear-gradient(135deg, rgba(80,160,255,0.9), rgba(80,100,240,0.9)); box-shadow: 0 0 20px rgba(80,140,255,0.4); }
+
+#hint {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  font-size: .7rem; letter-spacing: .14em;
+  color: rgba(255,255,255,0.22);
+  pointer-events: none; white-space: nowrap; z-index: 5;
+}
+</style>
+</head>
+<body>
+
+<video id="bg-video" autoplay loop muted playsinline></video>
+<canvas id="bg-canvas"></canvas>
+<canvas id="finish-canvas"></canvas>
+
+<div id="timer-wrap">
+  <div id="label"></div>
+  <div id="display">00:00</div>
+  <div id="bar-wrap"><div id="bar"></div></div>
+</div>
+
+<div id="edit-panel">
+  <div id="panel-box">
+    <h2>⚙ Timer Einstellungen</h2>
+
+    <div class="section-title">⏱ Timer</div>
+    <div class="row">
+      <label>Label (leer = kein Label)</label>
+      <input type="text" id="cfg-label" placeholder="z.B. STREAM STARTET IN">
+    </div>
+    <div class="row">
+      <label>Zeit</label>
+      <div class="time-row">
+        <div class="col"><label>Stunden</label><input type="number" id="cfg-h" value="0" min="0" max="23"></div>
+        <div class="col"><label>Minuten</label><input type="number" id="cfg-m" value="5" min="0" max="59"></div>
+        <div class="col"><label>Sekunden</label><input type="number" id="cfg-s" value="0" min="0" max="59"></div>
+      </div>
+    </div>
+    <div class="row">
+      <label>Modus</label>
+      <select id="cfg-mode">
+        <option value="countdown">⬇ Countdown</option>
+        <option value="countup">⬆ Countup (Stopuhr)</option>
+      </select>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="cfg-bar" checked>
+      <span>Fortschrittsbalken anzeigen</span>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="cfg-autofinish">
+      <span>Bei 00:00 automatisch stoppen</span>
+    </div>
+    <div class="row">
+      <label>Text bei 00:00 (leer = kein Text)</label>
+      <input type="text" id="cfg-finish-text" placeholder="z.B. Stream startet sofort!">
+    </div>
+    <div class="row">
+      <label>Balken-Farbe</label>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <input type="color" id="cfg-bar-color" value="#44aaff" style="width:48px;height:38px;border:1px solid rgba(100,180,255,0.3);border-radius:8px;cursor:pointer;padding:2px;">
+        <input type="color" id="cfg-bar-color2" value="#ffffff" style="width:48px;height:38px;border:1px solid rgba(100,180,255,0.3);border-radius:8px;cursor:pointer;padding:2px;">
+        <span style="font-size:.72rem;letter-spacing:.1em;color:rgba(255,255,255,0.4);">START → ENDE</span>
+      </div>
+    </div>
+
+    <div class="section-title">🎆 Finish-Effekt bei 00:00</div>
+    <div class="effect-grid" id="finish-effect-grid">
+      <button class="effect-btn" data-effect="none">❌ Kein Effekt</button>
+      <button class="effect-btn active" data-effect="confetti">🎊 Konfetti</button>
+      <button class="effect-btn" data-effect="flash">⚡ Blitz / Flash</button>
+      <button class="effect-btn" data-effect="wave">🌊 Wellen</button>
+      <button class="effect-btn" data-effect="particles">✨ Partikel-Explosion</button>
+      <button class="effect-btn" data-effect="fire">🔥 Feuer</button>
+    </div>
+
+    <div class="section-title">🌌 Hintergrund-Effekt (während Timer)</div>
+    <div class="effect-grid" id="bg-effect-grid">
+      <button class="effect-btn active" data-bgeffect="none">❌ Keiner</button>
+      <button class="effect-btn" data-bgeffect="stars">⭐ Sterne</button>
+      <button class="effect-btn" data-bgeffect="bubbles">🫧 Blasen</button>
+      <button class="effect-btn" data-bgeffect="matrix">💚 Matrix</button>
+      <button class="effect-btn" data-bgeffect="neon">🌈 Neon-Wellen</button>
+      <button class="effect-btn" data-bgeffect="snow">❄️ Schnee</button>
+    </div>
+    <div class="range-row">
+      <label>Intensität Hintergrund</label>
+      <input type="range" id="cfg-bg-intensity" min="1" max="10" value="5">
+    </div>
+
+    <div class="section-title">🎬 Video-Hintergrund</div>
+    <div id="video-drop" onclick="document.getElementById('video-file').click()">
+      <div id="video-drop-text">📂 Klicken zum Video auswählen<br><span style="font-size:.65rem;opacity:.6;">MP4, WebM, MOV</span></div>
+    </div>
+    <input type="file" id="video-file" accept="video/*">
+    <div id="video-controls" style="display:none;">
+      <button class="small-btn blue" id="btn-video-toggle">▶ Aktivieren</button>
+      <button class="small-btn" id="btn-video-remove">🗑 Entfernen</button>
+      <span id="video-name" style="font-size:.7rem;color:rgba(255,255,255,0.4);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    </div>
+    <div class="range-row" id="video-opacity-row" style="display:none;">
+      <label>Video Deckkraft</label>
+      <input type="range" id="cfg-video-opacity" min="0" max="100" value="100">
+    </div>
+
+    <button id="save-btn">✓ Übernehmen &amp; Schließen</button>
+  </div>
+</div>
+
+<div id="hint"># = Einstellungen &nbsp;|&nbsp; P = Start/Pause &nbsp;|&nbsp; R = Reset</div>
+
+<script>
+// ── State ──
+let totalSeconds = 300, remaining = 300, running = false, interval = null;
+let mode = 'countdown', countupSecs = 0;
+let showBar = true, autoFinish = false, editOpen = false;
+let barColor1 = '#44aaff', barColor2 = '#ffffff';
+let finishText = '', finishEffect = 'confetti';
+let bgEffect = 'none', bgIntensity = 5;
+let videoActive = false, videoOpacity = 100, videoURL = null;
+let finishedOnce = false;
+
+const display  = document.getElementById('display');
+const labelEl  = document.getElementById('label');
+const barWrap  = document.getElementById('bar-wrap');
+const bar      = document.getElementById('bar');
+const panel    = document.getElementById('edit-panel');
+const bgCanvas = document.getElementById('bg-canvas');
+const fxCanvas = document.getElementById('finish-canvas');
+const bgCtx    = bgCanvas.getContext('2d');
+const fxCtx    = fxCanvas.getContext('2d');
+const bgVideo  = document.getElementById('bg-video');
+
+function resizeCanvases() {
+  bgCanvas.width = fxCanvas.width = window.innerWidth;
+  bgCanvas.height = fxCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvases);
+resizeCanvases();
+
+// ── Timer ──
+function fmt(secs) {
+  secs = Math.max(0, secs);
+  const h = Math.floor(secs/3600), m = Math.floor((secs%3600)/60), s = secs%60;
+  return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function render() {
+  const val = mode === 'countdown' ? remaining : countupSecs;
+  if (!(mode === 'countdown' && remaining === 0 && finishText)) display.textContent = fmt(val);
+  if (mode === 'countdown' && showBar && totalSeconds > 0) {
+    barWrap.classList.add('visible');
+    const pct = (remaining / totalSeconds) * 100;
+    bar.style.width = pct + '%';
+    bar.style.background = `linear-gradient(90deg, ${barColor1}, ${barColor2})`;
+    bar.style.boxShadow = `0 0 10px ${barColor1}`;
+  } else {
+    barWrap.classList.remove('visible');
+  }
+  if (mode === 'countdown' && remaining === 0) {
+    display.classList.add('finished');
+    display.classList.remove('running');
+    if (finishText) display.textContent = finishText;
+  } else {
+    display.classList.remove('finished');
+    display.classList.toggle('running', running);
+  }
+}
+
+function tick() {
+  if (mode === 'countdown') {
+    if (remaining > 0) remaining--;
+    if (remaining === 0 && !finishedOnce) { finishedOnce = true; triggerFinishEffect(); }
+    if (remaining === 0 && autoFinish) stop();
+  } else { countupSecs++; }
+  render();
+}
+
+function start() {
+  if (running || (mode === 'countdown' && remaining === 0)) return;
+  running = true; interval = setInterval(tick, 1000); render();
+}
+function pause() { if (!running) return; running = false; clearInterval(interval); render(); }
+function stop()  { running = false; clearInterval(interval); render(); }
+function toggle(){ if (running) pause(); else start(); }
+function reset() { stop(); remaining = totalSeconds; countupSecs = 0; finishedOnce = false; clearFinishFX(); render(); }
+
+// ── Background Effects ──
+let bgParticles = [], bgAnimFrame = null;
+
+function initBgEffect() {
+  bgParticles = [];
+  if (bgAnimFrame) cancelAnimationFrame(bgAnimFrame);
+  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+  if (bgEffect === 'none') return;
+  const W = bgCanvas.width, H = bgCanvas.height;
+  const count = bgIntensity * 15;
+  if (bgEffect === 'stars') {
+    for (let i=0;i<count*2;i++) bgParticles.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*2+0.5, twinkle:Math.random()*Math.PI*2 });
+  } else if (bgEffect === 'bubbles') {
+    for (let i=0;i<count;i++) bgParticles.push({ x:Math.random()*W, y:H+Math.random()*200, r:Math.random()*20+5, speed:Math.random()*0.8+0.3, alpha:Math.random()*0.3+0.05, drift:(Math.random()-0.5)*0.5 });
+  } else if (bgEffect === 'matrix') {
+    const cols = Math.floor(W/18);
+    for (let i=0;i<cols;i++) bgParticles.push({ x:i*18, y:Math.random()*H, speed:Math.random()*3+1 });
+  } else if (bgEffect === 'neon') {
+    for (let i=0;i<8;i++) bgParticles.push({ offset:Math.random()*Math.PI*2, speed:Math.random()*0.01+0.005, amp:Math.random()*60+20, hue:Math.random()*360, width:Math.random()*3+1, alpha:Math.random()*0.25+0.05 });
+  } else if (bgEffect === 'snow') {
+    for (let i=0;i<count*3;i++) bgParticles.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*3+1, speed:Math.random()*1+0.2, drift:(Math.random()-0.5)*0.5, alpha:Math.random()*0.6+0.2 });
+  }
+  animateBg();
+}
+
+function animateBg() {
+  bgAnimFrame = requestAnimationFrame(animateBg);
+  const W = bgCanvas.width, H = bgCanvas.height;
+  const t = Date.now()/1000;
+  bgCtx.clearRect(0,0,W,H);
+
+  if (bgEffect === 'stars') {
+    bgParticles.forEach(p => {
+      p.twinkle += 0.03;
+      const a = (Math.sin(p.twinkle)+1)/2*0.8+0.1;
+      bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      bgCtx.fillStyle = `rgba(255,255,255,${a})`; bgCtx.fill();
+      p.y -= 0.1; if (p.y < -5) { p.y = H+5; p.x = Math.random()*W; }
+    });
+  } else if (bgEffect === 'bubbles') {
+    bgParticles.forEach(p => {
+      bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      bgCtx.strokeStyle = `rgba(150,220,255,${p.alpha})`; bgCtx.lineWidth=1.5; bgCtx.stroke();
+      bgCtx.beginPath(); bgCtx.arc(p.x-p.r*0.3,p.y-p.r*0.3,p.r*0.25,0,Math.PI*2);
+      bgCtx.fillStyle = `rgba(255,255,255,${p.alpha*0.8})`; bgCtx.fill();
+      p.y -= p.speed*(bgIntensity*0.12); p.x += p.drift;
+      if (p.y < -p.r*2) { p.y=H+p.r; p.x=Math.random()*W; }
+    });
+  } else if (bgEffect === 'matrix') {
+    bgCtx.fillStyle='rgba(0,0,0,0.04)'; bgCtx.fillRect(0,0,W,H);
+    bgCtx.font="14px 'Space Mono',monospace";
+    bgParticles.forEach(p => {
+      const ch = String.fromCharCode(0x30A0+Math.random()*96);
+      bgCtx.fillStyle=`rgba(0,255,80,${0.08+bgIntensity*0.02})`; bgCtx.fillText(ch,p.x,p.y);
+      p.y += p.speed*(bgIntensity*0.25); if (p.y>H) p.y=-20;
+    });
+  } else if (bgEffect === 'neon') {
+    bgParticles.forEach(p => {
+      p.offset += p.speed*bgIntensity*0.2;
+      bgCtx.beginPath();
+      for (let x=0;x<W;x+=4) {
+        const y = H/2+Math.sin(x*0.01+p.offset)*p.amp+Math.cos(x*0.007+p.offset*0.7)*p.amp*0.5;
+        x===0?bgCtx.moveTo(x,y):bgCtx.lineTo(x,y);
+      }
+      bgCtx.strokeStyle=`hsla(${p.hue+t*20},100%,60%,${p.alpha})`;
+      bgCtx.lineWidth=p.width; bgCtx.stroke();
+    });
+  } else if (bgEffect === 'snow') {
+    bgParticles.forEach(p => {
+      bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      bgCtx.fillStyle=`rgba(255,255,255,${p.alpha})`; bgCtx.fill();
+      p.y += p.speed*(bgIntensity*0.12);
+      p.x += p.drift+Math.sin(t+p.y*0.01)*0.3;
+      if (p.y>H+5){p.y=-5;p.x=Math.random()*W;}
+    });
+  }
+}
+
+// ── Finish Effects ──
+let fxParticles = [], fxAnimFrame = null, fxRunning = false;
+
+function clearFinishFX() {
+  fxRunning = false;
+  if (fxAnimFrame) cancelAnimationFrame(fxAnimFrame);
+  fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+  fxParticles = [];
+}
+
+function triggerFinishEffect() {
+  clearFinishFX();
+  if (finishEffect === 'none') return;
+  fxRunning = true;
+  const W = fxCanvas.width, H = fxCanvas.height;
+
+  if (finishEffect === 'confetti') {
+    for (let i=0;i<220;i++) fxParticles.push({
+      x:Math.random()*W, y:-20-Math.random()*H*0.5,
+      vx:(Math.random()-0.5)*6, vy:Math.random()*4+2,
+      r:Math.random()*7+3, rot:Math.random()*Math.PI*2, rotV:(Math.random()-0.5)*0.15,
+      color:`hsl(${Math.random()*360},90%,60%)`,
+      shape:Math.random()>0.5?'rect':'circle', alpha:1
+    });
+    (function anim(){
+      fxCtx.clearRect(0,0,W,H); let alive=false;
+      fxParticles.forEach(p=>{
+        if(p.alpha<=0)return; alive=true;
+        p.x+=p.vx;p.y+=p.vy;p.vy+=0.12;p.vx*=0.99;p.rot+=p.rotV;p.alpha-=0.007;
+        fxCtx.save();fxCtx.globalAlpha=Math.max(0,p.alpha);fxCtx.translate(p.x,p.y);fxCtx.rotate(p.rot);
+        fxCtx.fillStyle=p.color;
+        if(p.shape==='rect')fxCtx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);
+        else{fxCtx.beginPath();fxCtx.arc(0,0,p.r/2,0,Math.PI*2);fxCtx.fill();}
+        fxCtx.restore();
+      });
+      fxCtx.globalAlpha=1;
+      if(alive)fxAnimFrame=requestAnimationFrame(anim);
+    })();
+
+  } else if (finishEffect === 'flash') {
+    let alpha=1,flashes=0;
+    (function doFlash(){
+      fxCtx.clearRect(0,0,W,H);
+      fxCtx.fillStyle=`rgba(255,255,255,${alpha})`;fxCtx.fillRect(0,0,W,H);
+      alpha-=0.04;
+      if(alpha>0){fxAnimFrame=requestAnimationFrame(doFlash);}
+      else if(flashes<3){flashes++;alpha=0.6;setTimeout(()=>{fxAnimFrame=requestAnimationFrame(doFlash);},120);}
+      else{fxCtx.clearRect(0,0,W,H);}
+    })();
+
+  } else if (finishEffect === 'wave') {
+    let t=0;
+    (function doWave(){
+      fxCtx.clearRect(0,0,W,H);
+      for(let w=0;w<5;w++){
+        const prog=t-w*0.2; if(prog<0)continue;
+        const radius=prog*Math.max(W,H)*0.9;
+        const alpha=Math.max(0,0.6-prog*0.55);
+        fxCtx.beginPath();fxCtx.arc(W/2,H/2,radius,0,Math.PI*2);
+        fxCtx.strokeStyle=`hsla(${200+w*30},100%,70%,${alpha})`;
+        fxCtx.lineWidth=4-w*0.5;fxCtx.stroke();
+      }
+      t+=0.018;
+      if(t<2.2)fxAnimFrame=requestAnimationFrame(doWave);
+      else fxCtx.clearRect(0,0,W,H);
+    })();
+
+  } else if (finishEffect === 'particles') {
+    for(let i=0;i<180;i++){
+      const angle=Math.random()*Math.PI*2,speed=Math.random()*12+3;
+      fxParticles.push({x:W/2,y:H/2,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:Math.random()*5+2,color:`hsl(${Math.random()*360},100%,65%)`,alpha:1});
+    }
+    (function anim(){
+      fxCtx.clearRect(0,0,W,H);let alive=false;
+      fxParticles.forEach(p=>{
+        if(p.alpha<=0)return;alive=true;
+        p.x+=p.vx;p.y+=p.vy;p.vy+=0.2;p.vx*=0.98;p.alpha-=0.013;
+        fxCtx.globalAlpha=Math.max(0,p.alpha);
+        fxCtx.beginPath();fxCtx.arc(p.x,p.y,p.r,0,Math.PI*2);fxCtx.fillStyle=p.color;fxCtx.fill();
+      });
+      fxCtx.globalAlpha=1;
+      if(alive)fxAnimFrame=requestAnimationFrame(anim);
+      else fxCtx.clearRect(0,0,W,H);
+    })();
+
+  } else if (finishEffect === 'fire') {
+    const GW=Math.ceil(W/8), GH=Math.ceil(H/8);
+    const grid=new Float32Array(GW*GH);
+    setTimeout(()=>{fxRunning=false;},4500);
+    (function doFire(){
+      for(let x=0;x<GW;x++)grid[(GH-1)*GW+x]=Math.random()>0.3?1:0;
+      for(let y=0;y<GH-1;y++)for(let x=0;x<GW;x++){
+        const bx=Math.min(GW-1,Math.max(0,x+(Math.random()*3|0)-1));
+        grid[y*GW+x]=grid[(y+1)*GW+bx]*(0.86+Math.random()*0.06);
+      }
+      fxCtx.clearRect(0,0,W,H);
+      for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){
+        const v=grid[y*GW+x]; if(v<0.05)continue;
+        fxCtx.fillStyle=`rgba(${Math.min(255,v*510)|0},${Math.max(0,v*255-80)|0},0,${v*0.85})`;
+        fxCtx.fillRect(x*8,y*8,9,9);
+      }
+      if(fxRunning)fxAnimFrame=requestAnimationFrame(doFire);
+      else fxCtx.clearRect(0,0,W,H);
+    })();
+  }
+}
+
+// ── Video ──
+document.getElementById('video-file').addEventListener('change', function(){
+  const file=this.files[0]; if(!file)return;
+  if(videoURL)URL.revokeObjectURL(videoURL);
+  videoURL=URL.createObjectURL(file);
+  bgVideo.src=videoURL;
+  document.getElementById('video-drop').classList.add('has-video');
+  document.getElementById('video-drop-text').textContent='✅ '+file.name;
+  document.getElementById('video-controls').style.display='flex';
+  document.getElementById('video-opacity-row').style.display='';
+  document.getElementById('video-name').textContent=file.name;
+});
+
+document.getElementById('btn-video-toggle').addEventListener('click',()=>{
+  videoActive=!videoActive;
+  bgVideo.classList.toggle('active',videoActive);
+  bgVideo.style.opacity=videoOpacity/100;
+  if(videoActive)bgVideo.play();
+  document.getElementById('btn-video-toggle').textContent=videoActive?'⏸ Deaktivieren':'▶ Aktivieren';
+});
+
+document.getElementById('btn-video-remove').addEventListener('click',()=>{
+  videoActive=false; bgVideo.classList.remove('active'); bgVideo.src='';
+  if(videoURL){URL.revokeObjectURL(videoURL);videoURL=null;}
+  document.getElementById('video-drop').classList.remove('has-video');
+  document.getElementById('video-drop-text').innerHTML='📂 Klicken zum Video auswählen<br><span style="font-size:.65rem;opacity:.6;">MP4, WebM, MOV</span>';
+  document.getElementById('video-controls').style.display='none';
+  document.getElementById('video-opacity-row').style.display='none';
+});
+
+document.getElementById('cfg-video-opacity').addEventListener('input',function(){
+  videoOpacity=parseInt(this.value);
+  bgVideo.style.opacity=videoOpacity/100;
+});
+
+// ── Edit Panel ──
+document.getElementById('finish-effect-grid').addEventListener('click',e=>{
+  const btn=e.target.closest('.effect-btn'); if(!btn)return;
+  document.querySelectorAll('#finish-effect-grid .effect-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+});
+document.getElementById('bg-effect-grid').addEventListener('click',e=>{
+  const btn=e.target.closest('.effect-btn'); if(!btn)return;
+  document.querySelectorAll('#bg-effect-grid .effect-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+});
+
+function openEdit(){
+  editOpen=true; if(running)pause();
+  const h=Math.floor(totalSeconds/3600),m=Math.floor((totalSeconds%3600)/60),s=totalSeconds%60;
+  document.getElementById('cfg-h').value=h;
+  document.getElementById('cfg-m').value=m;
+  document.getElementById('cfg-s').value=s;
+  document.getElementById('cfg-label').value=labelEl.textContent;
+  document.getElementById('cfg-mode').value=mode;
+  document.getElementById('cfg-bar').checked=showBar;
+  document.getElementById('cfg-autofinish').checked=autoFinish;
+  document.getElementById('cfg-finish-text').value=finishText;
+  document.getElementById('cfg-bar-color').value=barColor1;
+  document.getElementById('cfg-bar-color2').value=barColor2;
+  document.getElementById('cfg-bg-intensity').value=bgIntensity;
+  document.getElementById('cfg-video-opacity').value=videoOpacity;
+  document.querySelectorAll('#finish-effect-grid .effect-btn').forEach(b=>b.classList.toggle('active',b.dataset.effect===finishEffect));
+  document.querySelectorAll('#bg-effect-grid .effect-btn').forEach(b=>b.classList.toggle('active',b.dataset.bgeffect===bgEffect));
+  panel.classList.add('open');
+}
+
+function closeEdit(){
+  editOpen=false; panel.classList.remove('open');
+}
+
+document.getElementById('save-btn').addEventListener('click',()=>{
+  const h=parseInt(document.getElementById('cfg-h').value)||0;
+  const m=parseInt(document.getElementById('cfg-m').value)||0;
+  const s=parseInt(document.getElementById('cfg-s').value)||0;
+  totalSeconds=h*3600+m*60+s; remaining=totalSeconds; countupSecs=0; finishedOnce=false;
+
+  const lbl=document.getElementById('cfg-label').value.trim();
+  labelEl.textContent=lbl; labelEl.classList.toggle('visible',lbl.length>0);
+  mode=document.getElementById('cfg-mode').value;
+  showBar=document.getElementById('cfg-bar').checked;
+  autoFinish=document.getElementById('cfg-autofinish').checked;
+  finishText=document.getElementById('cfg-finish-text').value.trim();
+  barColor1=document.getElementById('cfg-bar-color').value;
+  barColor2=document.getElementById('cfg-bar-color2').value;
+  bgIntensity=parseInt(document.getElementById('cfg-bg-intensity').value);
+
+  const activeBg=document.querySelector('#bg-effect-grid .effect-btn.active');
+  const newBg=activeBg?activeBg.dataset.bgeffect:'none';
+  if(newBg!==bgEffect){bgEffect=newBg;initBgEffect();}
+
+  const activeFx=document.querySelector('#finish-effect-grid .effect-btn.active');
+  finishEffect=activeFx?activeFx.dataset.effect:'none';
+
+  clearFinishFX(); render(); closeEdit();
+});
+
+panel.addEventListener('click',e=>{ if(e.target===panel)closeEdit(); });
+
+// ── Keyboard ──
+document.addEventListener('keydown',e=>{
+  const tag=document.activeElement.tagName;
+  const typing=tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';
+  if(e.key==='#'){e.preventDefault();if(editOpen)closeEdit();else openEdit();return;}
+  if(typing)return;
+  if(e.key==='p'||e.key==='P'){e.preventDefault();toggle();}
+  if(e.key==='r'||e.key==='R'){e.preventDefault();reset();}
+});
+
+render();
+</script>
+</body>
+</html>
