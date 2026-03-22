@@ -1,13 +1,3 @@
-"""
-Stream Timer Remote Control Server
-===================================
-Starte mit: python server.py
-
-Oeffnet zwei Server gleichzeitig:
-  - WebSocket auf Port 8765  (fuer stream_timer.html + remote.html)
-  - HTTP auf Port 8080       (damit du remote.html auf dem Tablet aufrufen kannst)
-"""
-
 import asyncio
 import json
 import websockets
@@ -15,11 +5,9 @@ import socket
 import os
 import threading
 
-# ── Clients ──
-# Zwei Gruppen: Timer-Client (sendet State) und Remote-Clients (senden Commands)
-clients = set()       # alle verbundenen WS-Clients
-timer_clients = set() # Timer sendet State mit type='state'
-remote_clients = set()# Remotes senden Commands
+clients = set()
+timer_clients = set()
+remote_clients = set()
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -45,14 +33,12 @@ async def handler(websocket):
                 msg_type = data.get('type', '')
                 cmd = data.get('cmd', '')
 
-                # State-Update vom Timer -> nur an Remote-Clients weiterleiten, NICHT zurueck an Timer
                 if msg_type == 'state':
                     if not is_timer:
                         is_timer = True
                         timer_clients.add(websocket)
                         remote_clients.discard(websocket)
-                        print(f"[~] {client_ip} identifiziert als TIMER")
-                    # An alle Remote-Clients senden
+                        print(f"[~] {client_ip} -> TIMER")
                     dead = set()
                     for rc in remote_clients:
                         try:
@@ -61,11 +47,10 @@ async def handler(websocket):
                             dead.add(rc)
                     remote_clients -= dead
 
-                # Command vom Remote -> nur an Timer-Clients weiterleiten
                 elif cmd:
                     if not is_timer and websocket not in remote_clients:
                         remote_clients.add(websocket)
-                        print(f"[~] {client_ip} identifiziert als REMOTE")
+                        print(f"[~] {client_ip} -> REMOTE")
                     print(f"[CMD] {cmd} von {client_ip}")
                     dead = set()
                     for tc in timer_clients:
@@ -86,7 +71,6 @@ async def handler(websocket):
         remote_clients.discard(websocket)
         print(f"[-] Getrennt: {client_ip} ({len(clients)} Clients)")
 
-# ── HTTP Server fuer remote.html ──
 def start_http_server(port, directory):
     import http.server
 
@@ -97,7 +81,7 @@ def start_http_server(port, directory):
             print(f"[HTTP] {args[0]} {args[1]}")
 
     httpd = http.server.HTTPServer(('0.0.0.0', port), Handler)
-    print(f"[HTTP] Server laeuft auf Port {port}")
+    print(f"[HTTP] Port {port} bereit")
     httpd.serve_forever()
 
 async def main():
@@ -105,7 +89,6 @@ async def main():
     http_port = 8080
     local_ip = get_local_ip()
 
-    # HTTP Server in separatem Thread starten
     script_dir = os.path.dirname(os.path.abspath(__file__))
     http_thread = threading.Thread(
         target=start_http_server,
@@ -119,7 +102,7 @@ async def main():
     print("=" * 54)
     print(f"")
     print(f"  1) stream_timer.html im Browser oeffnen")
-    print(f"     Panel (#) → Remote Control → URL eingeben:")
+    print(f"     Panel (#) > Remote Control > URL eingeben:")
     print(f"     ws://{local_ip}:{ws_port}")
     print(f"")
     print(f"  2) Tablet/Handy Browser oeffnen:")
