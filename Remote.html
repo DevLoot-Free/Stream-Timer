@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Stream Timer Remote</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a14;--panel:#0f0f1e;--border:rgba(100,180,255,.2);
+  --accent:#4af;--accent2:#8af;--red:#f44;--green:#4f8;--yellow:#fa4;
+  --text:#fff;--muted:rgba(255,255,255,.45);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;overflow-x:hidden;}
+body{display:flex;flex-direction:column;min-height:100vh;}
+
+/* ── Header ── */
+header{padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:50;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em;color:var(--accent);}
+.conn-status{display:flex;align-items:center;gap:7px;font-size:.7rem;letter-spacing:.1em;color:var(--muted);}
+.conn-dot{width:9px;height:9px;border-radius:50%;background:var(--red);transition:background .3s;}
+.conn-dot.connected{background:var(--green);}
+.conn-dot.connecting{background:var(--yellow);animation:blink .8s step-start infinite;}
+@keyframes blink{50%{opacity:0;}}
+
+/* ── Connect bar ── */
+#connect-bar{padding:14px 18px;background:rgba(0,0,0,.3);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+#connect-bar input{flex:1;min-width:200px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Space Mono',monospace;font-size:.85rem;padding:9px 12px;outline:none;}
+#connect-bar input:focus{border-color:var(--accent);}
+#btn-connect{padding:9px 18px;background:rgba(100,180,255,.2);border:1px solid var(--accent);border-radius:8px;color:var(--accent);font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;cursor:pointer;letter-spacing:.08em;white-space:nowrap;}
+#btn-connect:hover{background:rgba(100,180,255,.35);}
+#ws-hint{width:100%;font-size:.65rem;color:var(--muted);letter-spacing:.06em;}
+
+/* ── Timer display ── */
+#timer-display{text-align:center;padding:20px 18px 10px;background:var(--panel);border-bottom:1px solid var(--border);}
+#remote-time{font-family:'Bebas Neue',sans-serif;font-size:5rem;letter-spacing:.06em;color:var(--text);text-shadow:0 0 20px rgba(100,180,255,.5);}
+#remote-time.finished{color:var(--red);text-shadow:0 0 20px rgba(255,60,60,.6);animation:blink .6s step-start infinite;}
+#remote-status{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+#remote-loop{font-size:.72rem;letter-spacing:.15em;color:var(--accent);margin-top:2px;}
+
+/* ── Main controls ── */
+main{flex:1;padding:16px;display:flex;flex-direction:column;gap:14px;max-width:520px;margin:0 auto;width:100%;}
+
+.section{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.section-head{padding:10px 16px;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--border);background:rgba(100,180,255,.04);}
+
+/* Big control buttons */
+.big-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;}
+.big-btn-row.three{grid-template-columns:1fr 1fr 1fr;}
+.big-btn{padding:18px 10px;border-radius:12px;font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:1px solid;transition:all .15s;text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;}
+.big-btn:active{transform:scale(.95);}
+.big-btn.green{background:rgba(68,255,136,.12);border-color:rgba(68,255,136,.4);color:var(--green);}
+.big-btn.green:active{background:rgba(68,255,136,.25);}
+.big-btn.red{background:rgba(255,68,68,.12);border-color:rgba(255,68,68,.4);color:var(--red);}
+.big-btn.red:active{background:rgba(255,68,68,.25);}
+.big-btn.blue{background:rgba(100,180,255,.12);border-color:rgba(100,180,255,.4);color:var(--accent);}
+.big-btn.blue:active{background:rgba(100,180,255,.25);}
+.big-btn.yellow{background:rgba(255,170,68,.12);border-color:rgba(255,170,68,.4);color:var(--yellow);}
+.big-btn.yellow:active{background:rgba(255,170,68,.25);}
+.big-btn.purple{background:rgba(180,100,255,.12);border-color:rgba(180,100,255,.4);color:#b4f;}
+.big-btn.purple:active{background:rgba(180,100,255,.25);}
+
+/* Small grid */
+.btn-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px;}
+.btn-grid.two{grid-template-columns:1fr 1fr;}
+.grid-btn{padding:12px 6px;border-radius:10px;font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.04em;cursor:pointer;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(255,255,255,.6);text-align:center;transition:all .15s;user-select:none;-webkit-tap-highlight-color:transparent;}
+.grid-btn:active{background:rgba(100,180,255,.2);border-color:var(--accent);color:#fff;transform:scale(.96);}
+.grid-btn.active-btn{background:rgba(100,180,255,.2);border-color:var(--accent);color:#fff;}
+
+/* Timer set row */
+.time-set-row{display:flex;gap:8px;padding:12px;align-items:center;}
+.time-set-row input{flex:1;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.6rem;padding:8px;text-align:center;outline:none;width:100%;}
+.time-set-row input:focus{border-color:var(--accent);}
+.time-set-row label{font-size:.6rem;letter-spacing:.12em;color:var(--muted);text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+
+/* Label input */
+.label-row{padding:10px 12px;display:flex;gap:8px;}
+.label-row input{flex:1;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Space Mono',monospace;font-size:.82rem;padding:8px 12px;outline:none;}
+.label-row input:focus{border-color:var(--accent);}
+.label-row button{padding:8px 14px;background:rgba(100,180,255,.15);border:1px solid var(--accent);border-radius:8px;color:var(--accent);font-family:'Space Mono',monospace;font-size:.72rem;cursor:pointer;}
+
+/* Effect picker */
+.effect-row{display:flex;gap:6px;padding:10px 12px;flex-wrap:wrap;}
+.eff-btn{padding:7px 10px;border-radius:8px;font-size:.68rem;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
+.eff-btn:active,.eff-btn.picked{background:rgba(100,180,255,.2);border-color:var(--accent);color:#fff;}
+
+/* Log */
+#log{padding:10px 14px;font-size:.65rem;color:var(--muted);letter-spacing:.05em;border-top:1px solid var(--border);max-height:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18);letter-spacing:.1em;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🎬 Remote Control</div>
+  <div class="conn-status">
+    <div class="conn-dot" id="dot"></div>
+    <span id="conn-text">Nicht verbunden</span>
+  </div>
+</header>
+
+<div id="connect-bar">
+  <input type="text" id="ws-url" placeholder="ws://192.168.x.x:8765" autocomplete="off" autocorrect="off" spellcheck="false">
+  <button id="btn-connect">Verbinden</button>
+  <div id="ws-hint">IP aus server.py kopieren → hier eingeben → Verbinden</div>
+</div>
+
+<div id="timer-display">
+  <div id="remote-time">--:--</div>
+  <div id="remote-status">Nicht verbunden</div>
+  <div id="remote-loop"></div>
+</div>
+
+<main>
+
+  <!-- Hauptsteuerung -->
+  <div class="section">
+    <div class="section-head">⏱ Steuerung</div>
+    <div class="big-btn-row">
+      <div class="big-btn green" id="rbtn-play" onclick="send({cmd:'play'})">▶ Start</div>
+      <div class="big-btn yellow" id="rbtn-pause" onclick="send({cmd:'pause'})">⏸ Pause</div>
+    </div>
+    <div class="big-btn-row three">
+      <div class="big-btn red" onclick="send({cmd:'reset'})">↺ Reset</div>
+      <div class="big-btn blue" onclick="send({cmd:'toggle'})">▶⏸ Toggle</div>
+      <div class="big-btn purple" onclick="send({cmd:'trigger_fx'})">🎆 Effekt</div>
+    </div>
+  </div>
+
+  <!-- Zeit setzen -->
+  <div class="section">
+    <div class="section-head">⏰ Zeit setzen</div>
+    <div class="time-set-row">
+      <label>STD<input type="number" id="set-h" value="0" min="0" max="23"></label>
+      <label>MIN<input type="number" id="set-m" value="5" min="0" max="59"></label>
+      <label>SEK<input type="number" id="set-s" value="0" min="0" max="59"></label>
+    </div>
+    <div class="big-btn-row">
+      <div class="big-btn blue" onclick="sendTime()">✓ Übernehmen</div>
+      <div class="big-btn yellow" onclick="sendTimeAndStart()">✓ + Start</div>
+    </div>
+  </div>
+
+  <!-- Modus -->
+  <div class="section">
+    <div class="section-head">🔄 Modus</div>
+    <div class="btn-grid" id="mode-grid">
+      <div class="grid-btn active-btn" data-mode="countdown" onclick="pickMode(this)">⬇ Countdown</div>
+      <div class="grid-btn" data-mode="countup" onclick="pickMode(this)">⏱ Stoppuhr</div>
+      <div class="grid-btn" data-mode="loop" onclick="pickMode(this)">🔄 Loop</div>
+      <div class="grid-btn" data-mode="clock" onclick="pickMode(this)">⏰ Uhrzeit</div>
+    </div>
+  </div>
+
+  <!-- Label -->
+  <div class="section">
+    <div class="section-head">📝 Label</div>
+    <div class="label-row">
+      <input type="text" id="set-label" placeholder="z.B. STREAM STARTET IN">
+      <button onclick="sendLabel()">✓</button>
+    </div>
+  </div>
+
+  <!-- Finish Text -->
+  <div class="section">
+    <div class="section-head">💬 Text bei 00:00</div>
+    <div class="label-row">
+      <input type="text" id="set-finish-text" placeholder="z.B. Stream startet sofort!">
+      <button onclick="sendFinishText()">✓</button>
+    </div>
+  </div>
+
+  <!-- Finish Effekt -->
+  <div class="section">
+    <div class="section-head">🎆 Finish-Effekt</div>
+    <div class="effect-row" id="fx-grid">
+      <div class="eff-btn picked" data-fx="confetti" onclick="pickFx(this)">🎊 Konfetti</div>
+      <div class="eff-btn" data-fx="firework" onclick="pickFx(this)">🎉 Feuerwerk</div>
+      <div class="eff-btn" data-fx="lightning" onclick="pickFx(this)">⚡ Gewitter</div>
+      <div class="eff-btn" data-fx="tornado" onclick="pickFx(this)">🌀 Wirbel</div>
+      <div class="eff-btn" data-fx="explosion" onclick="pickFx(this)">💥 Explosion</div>
+      <div class="eff-btn" data-fx="magic" onclick="pickFx(this)">🪄 Magie</div>
+      <div class="eff-btn" data-fx="tsunami" onclick="pickFx(this)">🌊 Tsunami</div>
+      <div class="eff-btn" data-fx="matrix" onclick="pickFx(this)">🔮 Matrix</div>
+      <div class="eff-btn" data-fx="flash" onclick="pickFx(this)">⚡ Flash</div>
+      <div class="eff-btn" data-fx="wave" onclick="pickFx(this)">〰 Wellen</div>
+      <div class="eff-btn" data-fx="particles" onclick="pickFx(this)">✨ Partikel</div>
+      <div class="eff-btn" data-fx="fire" onclick="pickFx(this)">🔥 Feuer</div>
+      <div class="eff-btn" data-fx="none" onclick="pickFx(this)">🚫 Keiner</div>
+    </div>
+  </div>
+
+  <!-- Hintergrund Effekt -->
+  <div class="section">
+    <div class="section-head">🌌 Hintergrund-Effekt</div>
+    <div class="effect-row" id="bg-grid">
+      <div class="eff-btn picked" data-bg="none" onclick="pickBg(this)">🚫 Keiner</div>
+      <div class="eff-btn" data-bg="stars" onclick="pickBg(this)">⭐ Sterne</div>
+      <div class="eff-btn" data-bg="aurora" onclick="pickBg(this)">🌈 Aurora</div>
+      <div class="eff-btn" data-bg="particles" onclick="pickBg(this)">🔵 Partikel</div>
+      <div class="eff-btn" data-bg="rain" onclick="pickBg(this)">🌧 Regen</div>
+      <div class="eff-btn" data-bg="pulse" onclick="pickBg(this)">💜 Puls</div>
+      <div class="eff-btn" data-bg="galaxy" onclick="pickBg(this)">🌌 Galaxie</div>
+      <div class="eff-btn" data-bg="flames" onclick="pickBg(this)">🔥 Flammen</div>
+      <div class="eff-btn" data-bg="plasma" onclick="pickBg(this)">⚡ Plasma</div>
+      <div class="eff-btn" data-bg="ocean" onclick="pickBg(this)">🌊 Ozean</div>
+      <div class="eff-btn" data-bg="snow" onclick="pickBg(this)">❄️ Schnee</div>
+      <div class="eff-btn" data-bg="matrixbg" onclick="pickBg(this)">💚 Matrix</div>
+      <div class="eff-btn" data-bg="rainbow" onclick="pickBg(this)">🌈 Regenbogen</div>
+    </div>
+  </div>
+
+  <!-- Video -->
+  <div class="section">
+    <div class="section-head">🎬 Video</div>
+    <div class="big-btn-row three">
+      <div class="big-btn blue" onclick="send({cmd:'video_toggle'})">🎬 An/Aus</div>
+      <div class="big-btn yellow" onclick="send({cmd:'video_restart'})">⏮ Restart</div>
+      <div class="big-btn purple" onclick="send({cmd:'video_next'})">⏭ Next</div>
+    </div>
+  </div>
+
+  <!-- Skin -->
+  <div class="section">
+    <div class="section-head">🎨 Skin</div>
+    <div class="btn-grid" id="skin-grid">
+      <div class="grid-btn active-btn" data-skin="default" onclick="pickSkin(this)">🌌 Default</div>
+      <div class="grid-btn" data-skin="neon" onclick="pickSkin(this)">⚡ Neon</div>
+      <div class="grid-btn" data-skin="retro" onclick="pickSkin(this)">🖥️ Retro</div>
+      <div class="grid-btn" data-skin="minimal" onclick="pickSkin(this)">◻ Minimal</div>
+      <div class="grid-btn" data-skin="brutal" onclick="pickSkin(this)">💥 Brutal</div>
+    </div>
+  </div>
+
+</main>
+
+<div id="log">Warte auf Verbindung...</div>
+<footer>Stream Timer Remote • Lokal im Netzwerk</footer>
+
+<script>
+let ws = null;
+let reconnectTimer = null;
+let wsUrl = '';
+
+// ── Gespeicherte URL laden ──
+const saved = localStorage.getItem('ws_url');
+if (saved) document.getElementById('ws-url').value = saved;
+
+function setStatus(state) {
+  const dot = document.getElementById('dot');
+  const txt = document.getElementById('conn-text');
+  dot.className = 'conn-dot ' + state;
+  const map = { connected:'Verbunden ✓', connecting:'Verbinde...', '':'Nicht verbunden' };
+  txt.textContent = map[state] || 'Nicht verbunden';
+}
+
+function log(msg) {
+  document.getElementById('log').textContent = '› ' + msg;
+}
+
+function connect(url) {
+  if (ws) { ws.close(); ws = null; }
+  wsUrl = url;
+  localStorage.setItem('ws_url', url);
+  setStatus('connecting');
+  log('Verbinde mit ' + url + '...');
+
+  try {
+    ws = new WebSocket(url);
+  } catch(e) {
+    log('Fehler: ' + e.message);
+    setStatus('');
+    return;
+  }
+
+  ws.onopen = () => {
+    setStatus('connected');
+    log('Verbunden! Timer bereit.');
+    // Status anfragen
+    send({ cmd: 'get_state' });
+  };
+
+  ws.onmessage = (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      handleIncoming(data);
+    } catch {}
+  };
+
+  ws.onclose = () => {
+    setStatus('');
+    log('Verbindung getrennt. Reconnect in 3s...');
+    reconnectTimer = setTimeout(() => connect(wsUrl), 3000);
+  };
+
+  ws.onerror = () => {
+    log('Verbindungsfehler!');
+    setStatus('');
+  };
+}
+
+function send(data) {
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    log('Nicht verbunden!');
+    return;
+  }
+  ws.send(JSON.stringify(data));
+  log('Gesendet: ' + data.cmd);
+}
+
+// ── Eingehende State-Updates vom Timer ──
+function handleIncoming(data) {
+  if (data.type === 'state') {
+    // Zeit anzeigen
+    const t = document.getElementById('remote-time');
+    t.textContent = data.display || '--:--';
+    t.className = data.finished ? 'finished' : '';
+    document.getElementById('remote-status').textContent =
+      data.running ? '▶ LÄUFT' : (data.finished ? '✓ FERTIG' : '⏸ PAUSIERT');
+    document.getElementById('remote-loop').textContent =
+      data.loopCount > 0 ? 'LOOP ' + data.loopCount : '';
+
+    // Aktiven Modus markieren
+    if (data.mode) {
+      document.querySelectorAll('#mode-grid .grid-btn').forEach(b =>
+        b.classList.toggle('active-btn', b.dataset.mode === data.mode));
+    }
+    // Aktiven Skin markieren
+    if (data.skin) {
+      document.querySelectorAll('#skin-grid .grid-btn').forEach(b =>
+        b.classList.toggle('active-btn', b.dataset.skin === data.skin));
+    }
+    // Aktiven Effekt markieren
+    if (data.finishEffect) {
+      document.querySelectorAll('#fx-grid .eff-btn').forEach(b =>
+        b.classList.toggle('picked', b.dataset.fx === data.finishEffect));
+    }
+    if (data.bgEffect) {
+      document.querySelectorAll('#bg-grid .eff-btn').forEach(b =>
+        b.classList.toggle('picked', b.dataset.bg === data.bgEffect));
+    }
+  }
+}
+
+// ── Aktionen ──
+function sendTime() {
+  const h = parseInt(document.getElementById('set-h').value) || 0;
+  const m = parseInt(document.getElementById('set-m').value) || 0;
+  const s = parseInt(document.getElementById('set-s').value) || 0;
+  send({ cmd: 'set_time', h, m, s });
+}
+function sendTimeAndStart() {
+  const h = parseInt(document.getElementById('set-h').value) || 0;
+  const m = parseInt(document.getElementById('set-m').value) || 0;
+  const s = parseInt(document.getElementById('set-s').value) || 0;
+  send({ cmd: 'set_time', h, m, s });
+  setTimeout(() => send({ cmd: 'play' }), 100);
+}
+function sendLabel() {
+  send({ cmd: 'set_label', value: document.getElementById('set-label').value });
+}
+function sendFinishText() {
+  send({ cmd: 'set_finish_text', value: document.getElementById('set-finish-text').value });
+}
+function pickMode(el) {
+  document.querySelectorAll('#mode-grid .grid-btn').forEach(b => b.classList.remove('active-btn'));
+  el.classList.add('active-btn');
+  send({ cmd: 'set_mode', mode: el.dataset.mode });
+}
+function pickFx(el) {
+  document.querySelectorAll('#fx-grid .eff-btn').forEach(b => b.classList.remove('picked'));
+  el.classList.add('picked');
+  send({ cmd: 'set_finish_effect', effect: el.dataset.fx });
+}
+function pickBg(el) {
+  document.querySelectorAll('#bg-grid .eff-btn').forEach(b => b.classList.remove('picked'));
+  el.classList.add('picked');
+  send({ cmd: 'set_bg_effect', effect: el.dataset.bg });
+}
+function pickSkin(el) {
+  document.querySelectorAll('#skin-grid .grid-btn').forEach(b => b.classList.remove('active-btn'));
+  el.classList.add('active-btn');
+  send({ cmd: 'set_skin', skin: el.dataset.skin });
+}
+
+// ── Connect Button ──
+document.getElementById('btn-connect').addEventListener('click', () => {
+  const url = document.getElementById('ws-url').value.trim();
+  if (!url) return;
+  if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+  connect(url);
+});
+document.getElementById('ws-url').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('btn-connect').click();
+});
+
+// Auto-connect wenn URL gespeichert
+if (saved) connect(saved);
+</script>
+</body>
+</html>
