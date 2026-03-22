@@ -1,27 +1,75 @@
-# 🎬 Stream Timer
+# 🎬 Stream Timer Ultimate
 
-A lightweight, fully browser-based countdown timer built for live streamers. No installation, no dependencies — just open the HTML file and go.
+A fully browser-based, feature-packed countdown timer built for live streamers. No installation, no server, no dependencies — just open the HTML file and go.
 
-> Transparent background out of the box. Drop it straight into OBS as a Browser Source — no chroma key needed.
+> **100% transparent background.** Drop it into OBS as a Browser Source — no chroma key needed.
 
 ---
 
-## ✨ Features
+## ✨ Feature Overview
 
-- **Countdown & Stopwatch** — switch between counting down or up
-- **Custom Label** — display text above the timer like *"STREAM STARTING SOON"*
-- **Custom Finish Text** — show a message when the timer hits 00:00
-- **🎨 Timer Color & Glow** — fully customizable timer color, glow color and glow intensity
-- **✍️ Custom Font** — load any Google Font live (e.g. Orbitron, Audiowide, Press Start 2P)
-- **🔊 Finish Sound** — play your own audio file (MP3/WAV/OGG) when the timer ends
-- **Progress Bar** — with fully customizable gradient colors
-- **5 Finish Effects** — trigger an animation when the timer ends
-- **6 Background Effects** — subtle animated effects while the timer runs
-- **Video Background** — upload any MP4/WebM/MOV as a background
-- **💬 Twitch Chat Overlay** — show live chat messages next to your timer (no token needed)
-- **📱 Remote Control** — control the timer from your phone via QR code
-- **100% Transparent** — works natively in OBS without any green screen setup
-- **No install, no server** — single `.html` file, runs in any browser
+### ⏱ Timer Modes
+| Mode | Description |
+|------|-------------|
+| ⬇ Countdown | Counts down to zero |
+| ⏱ Stopwatch | Counts up from zero |
+| 🔄 Loop | Restarts automatically, tracks loop count |
+| ⏰ Clock | Shows the current live time |
+
+### 🌍 Timezone Support (Clock Mode)
+21 selectable timezones — from 🌺 Hawaii (UTC-12) to 🇳🇿 Auckland (UTC+12), including 🇺🇸 New York, 🇬🇧 London, 🇩🇪 Berlin, 🇯🇵 Japan, 🇦🇺 Sydney and more.
+
+---
+
+## 🎨 Visuals & Design
+
+- **5 Timer Skins** — Default, ⚡ Neon, 🖥️ Retro, ◻ Minimal, 💥 Brutal
+- **Custom font color** — pick any color for the timer digits
+- **Custom glow** — two glow colors + intensity slider
+- **Timer size** — slider from 40px to 300px
+- **Drop shadow** — color, blur size, X and Y offset
+- **Animated border** — Glow, Pulse, Spin, Dash styles with 2 custom colors
+- **Progress bar** — custom gradient colors (start → end)
+
+---
+
+## 🎆 Finish Effects (triggers at 00:00)
+
+🎊 Confetti · 🎉 Fireworks · ⚡ Lightning · 🌀 Tornado · 💥 Explosion · 🪄 Magic · 🌊 Tsunami · 🔮 Matrix · ⚡ Flash · 〰 Waves · ✨ Particles · 🔥 Fire
+
+---
+
+## 🌌 Background Effects (runs while timer is active)
+
+⭐ Stars · 🌈 Aurora · 🔵 Particles · 🌧 Rain · 💜 Pulse Glow · 🌌 Galaxy · 🔥 Flames · ⚡ Plasma · 🌊 Ocean Waves · ❄️ Snow · 💚 Matrix Code · 🌈 Rainbow Shift
+
+All effects have an **intensity slider**.
+
+---
+
+## 🎬 Video & Media
+
+- **Video Playlist** — add multiple MP4/WebM/MOV files, plays through automatically
+- **Loop** — repeat the playlist endlessly
+- **Shuffle** — randomize playback order
+- **Mute toggle** — silence video audio
+- **Opacity slider** — blend the video into the background
+- **GIF Background** — upload any GIF as a background layer with opacity control
+- **Quick toggle button** — visible on screen, no need to open settings
+
+---
+
+## 🎧 Spotify „Now Playing" Widget
+
+Shows current track, artist, album cover and a progress bar in the bottom-left corner. Cover can spin in vinyl style. Adapts to the active skin.
+
+> For automatic track updates, use tools like **Snip** (Windows) alongside the widget.
+
+---
+
+## 📝 News Ticker
+
+A scrolling text banner at the bottom of the screen. Add as many messages as you want (one per line). Adjustable scroll speed. Fully styled per skin.
 
 ---
 
@@ -29,95 +77,23 @@ A lightweight, fully browser-based countdown timer built for live streamers. No 
 
 | Key | Action |
 |-----|--------|
-| `#` | Open / Close Settings |
-| `P` | Start / Pause |
-| `R` | Reset |
-
----
-
-## 🎆 Finish Effects
-
-| Effect | Description |
-|--------|-------------|
-| 🎊 Confetti | Colorful confetti rains down the screen |
-| ⚡ Flash | Screen flashes white multiple times |
-| 🌊 Waves | Expanding ripple waves from the center |
-| ✨ Particles | Burst of colorful particles from the center |
-| 🔥 Fire | Fire simulation rises from the bottom |
-
----
-
-## 🌌 Background Effects
-
-| Effect | Description |
-|--------|-------------|
-| ⭐ Stars | Softly twinkling stars |
-| 🫧 Bubbles | Floating translucent bubbles |
-| 💚 Matrix | Falling katakana characters |
-| 🌈 Neon | Flowing neon wave lines |
-| ❄️ Snow | Falling snowflakes |
-
----
-
-## 💬 Twitch Chat Overlay
-
-1. Open Settings (`#`)
-2. Enter your Twitch channel name
-3. Click **Verbinden**
-4. Enable **Chat-Overlay anzeigen**
-
-Chat messages appear on the right side of the screen and fade out automatically. No API token or authentication required — anonymous read-only connection.
-
----
-
-## 📱 Remote Control
-
-Control the timer from your phone without touching your PC:
-
-1. Open Settings (`#`)
-2. Scroll to **Remote Control** → click **QR-Code anzeigen**
-3. Scan the QR code with your phone
-4. A controller page opens with Play/Pause, Reset and Stop buttons
-
-> **Note:** Both devices must use the same browser (e.g. Chrome) for the BroadcastChannel to work.
-
----
-
-## 🎨 Timer Color & Glow
-
-- **Timer Color** — pick any color for the digits
-- **Glow Color** — set the color of the glow/bloom effect
-- **Glow Strength** — slider from 0 (off) to 10 (intense)
-
----
-
-## ✍️ Custom Font
-
-Load any font from [Google Fonts](https://fonts.google.com):
-
-1. Open Settings (`#`)
-2. Enter the exact font name (e.g. `Orbitron`, `Audiowide`, `Press Start 2P`)
-3. Choose whether it applies to the timer digits, the label, or both
-4. Click **Vorschau** — the font loads live
-
----
-
-## 🔊 Finish Sound
-
-1. Open Settings (`#`)
-2. Click the audio upload area under **Sound bei Finish**
-3. Select a `.mp3`, `.wav` or `.ogg` file
-4. Use the **Test** button to preview, adjust volume with the slider
+| `#` | Open / Close settings |
+| `P` | Start / Pause timer |
+| `R` | Reset timer |
+| `V` | Toggle video on / off |
+| `N` | Skip to next video in playlist |
 
 ---
 
 ## 🖥️ OBS Setup
 
-1. In OBS, add a new **Browser Source**
+1. In OBS, add a **Browser Source**
 2. Check **"Local file"** and select `stream_timer.html`
-3. Set width & height to match your canvas (e.g. `1920 x 1080`)
-4. Make sure **"Shutdown source when not visible"** is unchecked
-5. Done — the background is already transparent
+3. Set width & height to match your canvas (e.g. `1920 × 1080`)
+4. Uncheck **"Shutdown source when not visible"**
+5. Done — background is transparent out of the box
+
+> **OBS tip:** Right-click the source → **"Interact"** to click buttons inside the timer without switching focus.
 
 ---
 
@@ -125,21 +101,16 @@ Load any font from [Google Fonts](https://fonts.google.com):
 
 ```
 1. Download stream_timer.html
-2. Open it in your browser
+2. Open it in your browser or add it to OBS as a Browser Source
 3. Press # to open settings
-4. Press P to start
+4. Configure your timer, effects, skin, and media
+5. Press P to start
 ```
 
-No npm, no build step, no internet required after the first load.
+No npm. No build step. No internet required after the first load (Google Fonts loads once).
 
 ---
 
 ## 📄 License
 
 MIT — free to use, modify and share.
-
----
-
-## 🤝 Part of [DevLoot-Free](https://github.com/DevLoot-Free)
-
-A collection of free, open-source tools for developers and streamers.
