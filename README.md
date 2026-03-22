@@ -124,3 +124,14 @@ netsh advfirewall firewall add rule name="StreamTimer WS" protocol=TCP dir=in lo
 ## License
 
 MIT
+
+---
+
+## Security
+
+Both `stream_timer.html` and `server.py` have been scanned and are clean.
+
+- VirusTotal: https://www.virustotal.com/gui/file/663fc2dedcde30b98254e0a5ce616acd4f06e9286e5e7e575eb6f02346f54d20
+- Hybrid Analysis: https://hybrid-analysis.com/sample/663fc2dedcde30b98254e0a5ce616acd4f06e9286e5e7e575eb6f02346f54d20
+
+The source code is fully open — read every line yourself if you want.
