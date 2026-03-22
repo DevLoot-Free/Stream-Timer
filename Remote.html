@@ -15,7 +15,6 @@
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;overflow-x:hidden;}
 body{display:flex;flex-direction:column;min-height:100vh;}
 
-/* ── Header ── */
 header{padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:50;}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em;color:var(--accent);}
 .conn-status{display:flex;align-items:center;gap:7px;font-size:.7rem;letter-spacing:.1em;color:var(--muted);}
@@ -24,7 +23,6 @@ header{padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--b
 .conn-dot.connecting{background:var(--yellow);animation:blink .8s step-start infinite;}
 @keyframes blink{50%{opacity:0;}}
 
-/* ── Connect bar ── */
 #connect-bar{padding:14px 18px;background:rgba(0,0,0,.3);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 #connect-bar input{flex:1;min-width:200px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Space Mono',monospace;font-size:.85rem;padding:9px 12px;outline:none;}
 #connect-bar input:focus{border-color:var(--accent);}
@@ -32,20 +30,17 @@ header{padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--b
 #btn-connect:hover{background:rgba(100,180,255,.35);}
 #ws-hint{width:100%;font-size:.65rem;color:var(--muted);letter-spacing:.06em;}
 
-/* ── Timer display ── */
 #timer-display{text-align:center;padding:20px 18px 10px;background:var(--panel);border-bottom:1px solid var(--border);}
 #remote-time{font-family:'Bebas Neue',sans-serif;font-size:5rem;letter-spacing:.06em;color:var(--text);text-shadow:0 0 20px rgba(100,180,255,.5);}
 #remote-time.finished{color:var(--red);text-shadow:0 0 20px rgba(255,60,60,.6);animation:blink .6s step-start infinite;}
 #remote-status{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
 #remote-loop{font-size:.72rem;letter-spacing:.15em;color:var(--accent);margin-top:2px;}
 
-/* ── Main controls ── */
 main{flex:1;padding:16px;display:flex;flex-direction:column;gap:14px;max-width:520px;margin:0 auto;width:100%;}
 
 .section{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
 .section-head{padding:10px 16px;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--border);background:rgba(100,180,255,.04);}
 
-/* Big control buttons */
 .big-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;}
 .big-btn-row.three{grid-template-columns:1fr 1fr 1fr;}
 .big-btn{padding:18px 10px;border-radius:12px;font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:1px solid;transition:all .15s;text-align:center;user-select:none;-webkit-tap-highlight-color:transparent;}
@@ -61,31 +56,26 @@ main{flex:1;padding:16px;display:flex;flex-direction:column;gap:14px;max-width:5
 .big-btn.purple{background:rgba(180,100,255,.12);border-color:rgba(180,100,255,.4);color:#b4f;}
 .big-btn.purple:active{background:rgba(180,100,255,.25);}
 
-/* Small grid */
 .btn-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px;}
 .btn-grid.two{grid-template-columns:1fr 1fr;}
 .grid-btn{padding:12px 6px;border-radius:10px;font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.04em;cursor:pointer;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(255,255,255,.6);text-align:center;transition:all .15s;user-select:none;-webkit-tap-highlight-color:transparent;}
 .grid-btn:active{background:rgba(100,180,255,.2);border-color:var(--accent);color:#fff;transform:scale(.96);}
 .grid-btn.active-btn{background:rgba(100,180,255,.2);border-color:var(--accent);color:#fff;}
 
-/* Timer set row */
 .time-set-row{display:flex;gap:8px;padding:12px;align-items:center;}
 .time-set-row input{flex:1;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.6rem;padding:8px;text-align:center;outline:none;width:100%;}
 .time-set-row input:focus{border-color:var(--accent);}
 .time-set-row label{font-size:.6rem;letter-spacing:.12em;color:var(--muted);text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
 
-/* Label input */
 .label-row{padding:10px 12px;display:flex;gap:8px;}
 .label-row input{flex:1;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;color:#fff;font-family:'Space Mono',monospace;font-size:.82rem;padding:8px 12px;outline:none;}
 .label-row input:focus{border-color:var(--accent);}
 .label-row button{padding:8px 14px;background:rgba(100,180,255,.15);border:1px solid var(--accent);border-radius:8px;color:var(--accent);font-family:'Space Mono',monospace;font-size:.72rem;cursor:pointer;}
 
-/* Effect picker */
 .effect-row{display:flex;gap:6px;padding:10px 12px;flex-wrap:wrap;}
 .eff-btn{padding:7px 10px;border-radius:8px;font-size:.68rem;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
 .eff-btn:active,.eff-btn.picked{background:rgba(100,180,255,.2);border-color:var(--accent);color:#fff;}
 
-/* Log */
 #log{padding:10px 14px;font-size:.65rem;color:var(--muted);letter-spacing:.05em;border-top:1px solid var(--border);max-height:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18);letter-spacing:.1em;}
@@ -115,7 +105,7 @@ footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18
 
 <main>
 
-  <!-- Hauptsteuerung -->
+  
   <div class="section">
     <div class="section-head">⏱ Steuerung</div>
     <div class="big-btn-row">
@@ -129,7 +119,7 @@ footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18
     </div>
   </div>
 
-  <!-- Zeit setzen -->
+  
   <div class="section">
     <div class="section-head">⏰ Zeit setzen</div>
     <div class="time-set-row">
@@ -143,7 +133,7 @@ footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18
     </div>
   </div>
 
-  <!-- Modus -->
+  
   <div class="section">
     <div class="section-head">🔄 Modus</div>
     <div class="btn-grid" id="mode-grid">
@@ -154,7 +144,7 @@ footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18
     </div>
   </div>
 
-  <!-- Label -->
+  
   <div class="section">
     <div class="section-head">📝 Label</div>
     <div class="label-row">
@@ -163,7 +153,7 @@ footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18
     </div>
   </div>
 
-  <!-- Finish Text -->
+  
   <div class="section">
     <div class="section-head">💬 Text bei 00:00</div>
     <div class="label-row">
@@ -172,7 +162,7 @@ footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18
     </div>
   </div>
 
-  <!-- Finish Effekt -->
+  
   <div class="section">
     <div class="section-head">🎆 Finish-Effekt</div>
     <div class="effect-row" id="fx-grid">
@@ -192,7 +182,7 @@ footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18
     </div>
   </div>
 
-  <!-- Hintergrund Effekt -->
+  
   <div class="section">
     <div class="section-head">🌌 Hintergrund-Effekt</div>
     <div class="effect-row" id="bg-grid">
@@ -212,7 +202,7 @@ footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18
     </div>
   </div>
 
-  <!-- Video -->
+  
   <div class="section">
     <div class="section-head">🎬 Video</div>
     <div class="big-btn-row three">
@@ -222,7 +212,7 @@ footer{padding:12px;text-align:center;font-size:.6rem;color:rgba(255,255,255,.18
     </div>
   </div>
 
-  <!-- Skin -->
+  
   <div class="section">
     <div class="section-head">🎨 Skin</div>
     <div class="btn-grid" id="skin-grid">
@@ -244,7 +234,6 @@ let ws = null;
 let reconnectTimer = null;
 let wsUrl = '';
 
-// ── Gespeicherte URL laden ──
 const saved = localStorage.getItem('ws_url');
 if (saved) document.getElementById('ws-url').value = saved;
 
@@ -278,7 +267,7 @@ function connect(url) {
   ws.onopen = () => {
     setStatus('connected');
     log('Verbunden! Timer bereit.');
-    // Status anfragen
+    
     send({ cmd: 'get_state' });
   };
 
@@ -310,10 +299,9 @@ function send(data) {
   log('Gesendet: ' + data.cmd);
 }
 
-// ── Eingehende State-Updates vom Timer ──
 function handleIncoming(data) {
   if (data.type === 'state') {
-    // Zeit anzeigen
+    
     const t = document.getElementById('remote-time');
     t.textContent = data.display || '--:--';
     t.className = data.finished ? 'finished' : '';
@@ -322,17 +310,17 @@ function handleIncoming(data) {
     document.getElementById('remote-loop').textContent =
       data.loopCount > 0 ? 'LOOP ' + data.loopCount : '';
 
-    // Aktiven Modus markieren
+    
     if (data.mode) {
       document.querySelectorAll('#mode-grid .grid-btn').forEach(b =>
         b.classList.toggle('active-btn', b.dataset.mode === data.mode));
     }
-    // Aktiven Skin markieren
+    
     if (data.skin) {
       document.querySelectorAll('#skin-grid .grid-btn').forEach(b =>
         b.classList.toggle('active-btn', b.dataset.skin === data.skin));
     }
-    // Aktiven Effekt markieren
+    
     if (data.finishEffect) {
       document.querySelectorAll('#fx-grid .eff-btn').forEach(b =>
         b.classList.toggle('picked', b.dataset.fx === data.finishEffect));
@@ -344,7 +332,6 @@ function handleIncoming(data) {
   }
 }
 
-// ── Aktionen ──
 function sendTime() {
   const h = parseInt(document.getElementById('set-h').value) || 0;
   const m = parseInt(document.getElementById('set-m').value) || 0;
@@ -385,7 +372,6 @@ function pickSkin(el) {
   send({ cmd: 'set_skin', skin: el.dataset.skin });
 }
 
-// ── Connect Button ──
 document.getElementById('btn-connect').addEventListener('click', () => {
   const url = document.getElementById('ws-url').value.trim();
   if (!url) return;
@@ -396,7 +382,6 @@ document.getElementById('ws-url').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('btn-connect').click();
 });
 
-// Auto-connect wenn URL gespeichert
 if (saved) connect(saved);
 </script>
 </body>
