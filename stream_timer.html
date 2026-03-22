@@ -16,12 +16,10 @@ body{background:transparent;width:100vw;height:100vh;display:flex;align-items:ce
 #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;}
 #finish-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:50;pointer-events:none;}
 
-/* ── Timer ── */
 #timer-wrap{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:10px;user-select:none;}
 #label{font-size:1.1rem;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#fff;text-shadow:0 0 12px rgba(255,255,255,.9),0 0 30px rgba(120,200,255,.6);opacity:0;transform:translateY(-6px);transition:opacity .4s,transform .4s;}
 #label.visible{opacity:1;transform:translateY(0);}
 
-/* Border wrapper */
 #display-border{position:relative;display:flex;align-items:center;justify-content:center;padding:0;}
 #display-border.border-active::before{content:'';position:absolute;inset:-12px;border-radius:18px;z-index:-1;animation:borderGlow 2s ease-in-out infinite;}
 #display-border.border-pulse::before{animation:borderPulse 1.5s ease-in-out infinite;}
@@ -42,7 +40,6 @@ body{background:transparent;width:100vw;height:100vh;display:flex;align-items:ce
 #bar-wrap.visible{opacity:1;}
 #bar{height:100%;border-radius:2px;transition:width 1s linear;}
 
-/* ══ SKINS ══ */
 body.skin-default #display{font-family:'Bebas Neue',sans-serif;}
 body.skin-default #display.finished{color:#ff4444;}
 body.skin-default #label{font-family:'Space Mono',monospace;}
@@ -70,7 +67,6 @@ body.skin-brutal #bar-wrap{border-radius:0;height:6px;}
 body.skin-brutal #bar{border-radius:0;}
 body.skin-brutal #sublabel{font-family:'Anton',sans-serif;font-size:.9rem;}
 
-/* ── Spotify Widget ── */
 #spotify-widget{position:fixed;bottom:80px;left:24px;z-index:20;display:none;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;backdrop-filter:blur(12px);max-width:320px;}
 #spotify-widget.visible{display:flex;}
 #spotify-widget.skin-default{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);}
@@ -88,7 +84,6 @@ body.skin-brutal #sublabel{font-family:'Anton',sans-serif;font-size:.9rem;}
 #sp-bar{height:100%;background:#1db954;border-radius:2px;}
 #sp-status{font-size:.6rem;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase;}
 
-/* ── Ticker ── */
 #ticker-wrap{position:fixed;bottom:0;left:0;right:0;z-index:20;display:none;overflow:hidden;padding:10px 0;}
 #ticker-wrap.visible{display:block;}
 #ticker-wrap.skin-default{background:rgba(0,0,0,.5);border-top:1px solid rgba(255,255,255,.1);}
@@ -109,7 +104,6 @@ body.skin-neon .ticker-sep{color:rgba(0,255,255,.4);}
 body.skin-retro .ticker-sep{color:rgba(255,136,0,.4);}
 body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
 
-/* ── Panel ── */
 #edit-panel{display:none;position:fixed;inset:0;align-items:flex-start;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(10px);z-index:100;overflow-y:auto;padding:24px 0 50px;}
 #edit-panel.open{display:flex;}
 #panel-box{background:rgba(8,8,18,.98);border:1px solid rgba(100,180,255,.28);border-radius:20px;padding:28px 34px;display:flex;flex-direction:column;gap:15px;min-width:360px;max-width:620px;width:94%;box-shadow:0 0 100px rgba(80,140,255,.15),0 8px 60px rgba(0,0,0,.8);margin:auto;}
@@ -198,9 +192,6 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
   <div id="ticker-inner"></div>
 </div>
 
-
-
-<!-- ══ PANEL ══ -->
 <div id="edit-panel">
  <div id="panel-box">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
@@ -211,7 +202,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     </div>
   </div>
 
-  <!-- SKIN -->
+  
   <div class="section-title" data-i18n="s_skin">🎨 Timer-Skin</div>
   <div class="skin-preview-grid" id="skin-grid">
     <div class="skin-btn active" data-skin="default">🌌<br>Default</div>
@@ -221,7 +212,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     <div class="skin-btn" data-skin="brutal">💥<br>Brutal</div>
   </div>
 
-  <!-- VISUALS -->
+  
   <div class="section-title" data-i18n="s_visuals">🎨 Visuals & Design</div>
   <div class="row">
     <label data-i18n="l_textcolor">Schriftfarbe & Glow-Farbe</label>
@@ -284,7 +275,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     </div>
   </div>
 
-  <!-- TIMER -->
+  
   <div class="section-title" data-i18n="s_timer">⏱ Timer & Modus</div>
   <div class="row">
     <label data-i18n="l_mode">Modus</label>
@@ -354,7 +345,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     <input type="text" id="cfg-finish-text" data-i18n-placeholder="ph_finishtext" placeholder="z.B. Stream startet sofort!">
   </div>
 
-  <!-- FINISH FX -->
+  
   <div class="section-title" data-i18n="s_finishfx">🎆 Finish-Effekt bei 00:00</div>
   <div class="effect-grid" id="finish-effect-grid">
     <div class="effect-btn" data-effect="none">🚫 Keiner</div>
@@ -372,7 +363,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     <div class="effect-btn" data-effect="fire">🔥 Feuer</div>
   </div>
 
-  <!-- BG FX -->
+  
   <div class="section-title" data-i18n="s_bgfx">🌌 Hintergrund-Effekt</div>
   <div class="effect-grid" id="bg-effect-grid">
     <div class="effect-btn active" data-bgeffect="none">🚫 Keiner</div>
@@ -397,7 +388,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     </div>
   </div>
 
-  <!-- VIDEO PLAYLIST -->
+  
   <div class="section-title" data-i18n="s_video">🎬 Video-Hintergrund (Playlist)</div>
   <div id="video-drop" onclick="document.getElementById('video-file').click()">
     📂 Videos hinzufügen (MP4, WebM, MOV)<br><span style="font-size:.62rem;opacity:.5;">Mehrere Videos = automatische Playlist</span>
@@ -432,7 +423,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     </div>
   </div>
 
-  <!-- GIF -->
+  
   <div class="section-title" data-i18n="s_gif">🎞 GIF-Hintergrund</div>
   <div id="gif-drop" onclick="document.getElementById('gif-file').click()">
     <span id="gif-drop-text">📂 GIF auswählen</span>
@@ -451,7 +442,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     </div>
   </div>
 
-  <!-- SPOTIFY -->
+  
   <div class="section-title" data-i18n="s_spotify">🎧 Spotify „Now Playing" Widget</div>
   <div class="checkbox-row">
     <input type="checkbox" id="cfg-spotify">
@@ -464,7 +455,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     <div class="checkbox-row"><input type="checkbox" id="cfg-sp-spin"><span data-i18n="cb_spspin">Cover dreht sich (Vinyl-Style)</span></div>
   </div>
 
-  <!-- TICKER -->
+  
   <div class="section-title" data-i18n="s_ticker">📝 News-Ticker</div>
   <div class="checkbox-row">
     <input type="checkbox" id="cfg-ticker">
@@ -486,7 +477,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
 
   <button id="save-btn" data-i18n="btn_save">✓ Übernehmen &amp; Schließen</button>
 
-  <!-- REMOTE -->
+  
   <div class="section-title">📡 Remote Control</div>
   <div class="row">
     <label>WebSocket Server URL</label>
@@ -501,7 +492,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
 </div>
 
 <script>
-// ── State ──
+
 let totalSeconds=300,remaining=300,running=false,interval=null,clockInterval=null;
 let mode='countdown',countupSecs=0,loopCount=0;
 let showBar=true,autoFinish=false;
@@ -518,8 +509,7 @@ let textColor='#ffffff',glowColor='#4488ff',glowColor2='#8844ff',glowStrength=60
 let fontSize=150,shadowColor='#000000',shadowSize=0,shadowX=4,shadowY=4;
 let borderStyle='none',borderColor='#44aaff',borderColor2='#ff44ff';
 
-// Playlist
-let playlist=[]; // [{name,url,blob}]
+let playlist=[]; 
 let currentTrack=0;
 
 const display=document.getElementById('display');
@@ -546,7 +536,6 @@ function fmt(secs){secs=Math.max(0,secs);const h=Math.floor(secs/3600),m=Math.fl
 function p(n){return String(n).padStart(2,'0');}
 function fmtClock(){const now=new Date();const utc=now.getTime()+now.getTimezoneOffset()*60000;const local=new Date(utc+utcOffset*3600000);return `${p(local.getHours())}:${p(local.getMinutes())}:${p(local.getSeconds())}`;}
 
-// ── Apply visuals ──
 function applyVisuals(){
   const g=glowStrength;
   let shadow=`0 0 ${g*.4}px ${glowColor}, 0 0 ${g}px ${glowColor}, 0 0 ${g*2}px ${glowColor2}`;
@@ -556,7 +545,7 @@ function applyVisuals(){
   display.style.fontSize=fontSize+'px';
   const ds=shadowSize>0?`drop-shadow(${shadowX}px ${shadowY}px ${shadowSize}px ${shadowColor})`:'none';
   display.style.filter=ds;
-  // Border
+  
   displayBorder.className='';
   displayBorder.style.setProperty('--border-color',borderColor);
   displayBorder.style.setProperty('--border-color2',borderColor2);
@@ -591,7 +580,6 @@ function tick(){
   render();
 }
 
-// ── Skin ──
 function applySkin(skin){
   document.body.className='skin-'+skin;
   spWidget.className=spWidget.classList.contains('visible')?'skin-'+skin+' visible':'skin-'+skin;
@@ -600,7 +588,6 @@ function applySkin(skin){
   applyVisuals();
 }
 
-// ── Spotify ──
 function updateSpotify(){
   if(!spotifyVisible){spWidget.classList.remove('visible');return;}
   spWidget.classList.add('visible');
@@ -611,7 +598,6 @@ function updateSpotify(){
   art.className=spSpin?'spinning':'';
 }
 
-// ── Ticker ──
 function updateTicker(){
   if(!tickerVisible||tickerTexts.length===0){tickerWrap.classList.remove('visible');return;}
   tickerWrap.classList.add('visible');
@@ -621,7 +607,6 @@ function updateTicker(){
   document.getElementById('ticker-inner').style.animationDuration=tickerSpeed+'s';
 }
 
-// ══ VIDEO PLAYLIST ══
 function renderPlaylist(){
   const list=document.getElementById('playlist-list');
   list.innerHTML='';
@@ -701,7 +686,6 @@ document.getElementById('cfg-video-loop').addEventListener('change',function(){v
 document.getElementById('cfg-video-shuffle').addEventListener('change',function(){videoShuffle=this.checked;});
 document.getElementById('cfg-video-mute').addEventListener('change',function(){videoMute=this.checked;bgVideo.muted=videoMute;});
 
-// ── GIF ──
 document.getElementById('gif-file').addEventListener('change',function(){
   const file=this.files[0];if(!file)return;
   if(gifURL)URL.revokeObjectURL(gifURL);
@@ -730,7 +714,6 @@ document.getElementById('btn-gif-remove').addEventListener('click',()=>{
 });
 document.getElementById('cfg-gif-opacity').addEventListener('input',function(){gifOpacity=parseInt(this.value);document.getElementById('gif-opacity-val').textContent=gifOpacity+'%';bgGif.style.opacity=gifOpacity/100;});
 
-// ── Live sliders in panel ──
 document.getElementById('cfg-font-size').addEventListener('input',function(){document.getElementById('font-size-val').textContent=this.value+'px';});
 document.getElementById('cfg-glow-strength').addEventListener('input',function(){document.getElementById('glow-strength-val').textContent=this.value;});
 document.getElementById('cfg-shadow-size').addEventListener('input',function(){document.getElementById('shadow-size-val').textContent=this.value+'px';});
@@ -741,7 +724,6 @@ document.getElementById('cfg-ticker-speed').addEventListener('input',function(){
 document.getElementById('cfg-spotify').addEventListener('change',function(){document.getElementById('spotify-config').style.display=this.checked?'flex':'none';});
 document.getElementById('cfg-ticker').addEventListener('change',function(){document.getElementById('ticker-config').style.display=this.checked?'flex':'none';});
 
-// ── Grid clicks ──
 function makeGrid(id,attr){document.getElementById(id).addEventListener('click',e=>{const btn=e.target.closest('['+attr+']')||e.target.closest('.effect-btn')||e.target.closest('.mode-btn')||e.target.closest('.skin-btn');if(!btn)return;document.querySelectorAll('#'+id+' .effect-btn,#'+id+' .mode-btn,#'+id+' .skin-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');});}
 makeGrid('skin-grid','data-skin');
 makeGrid('mode-grid','data-mode');
@@ -757,8 +739,6 @@ document.getElementById('mode-grid').addEventListener('click',e=>{
   document.getElementById('utc-row').style.display=isClock?'':'none';
 });
 
-// ── Open/Close ──
-// ── WebSocket panel buttons ──
 document.getElementById('btn-ws-connect').addEventListener('click', () => {
   const url = document.getElementById('cfg-ws-url').value.trim();
   if (!url) return;
@@ -776,7 +756,6 @@ document.getElementById('btn-ws-disconnect').addEventListener('click', () => {
   document.getElementById('ws-status').style.color = 'rgba(255,255,255,.35)';
 });
 
-// Update WS status indicator
 setInterval(() => {
   const el = document.getElementById('ws-status');
   if (!el) return;
@@ -792,7 +771,6 @@ setInterval(() => {
   }
 }, 1000);
 
-// Prefill WS URL in panel
 function openEdit(){
   editOpen=true;if(running&&mode!=='clock')pause();
   const h=Math.floor(totalSeconds/3600),m=Math.floor((totalSeconds%3600)/60),s=totalSeconds%60;
@@ -817,7 +795,7 @@ function openEdit(){
   document.querySelectorAll('#bg-effect-grid .effect-btn').forEach(b=>b.classList.toggle('active',b.dataset.bgeffect===bgEffect));
   document.querySelectorAll('#skin-grid .skin-btn').forEach(b=>b.classList.toggle('active',b.dataset.skin===currentSkin));
   document.querySelectorAll('#border-grid .effect-btn').forEach(b=>b.classList.toggle('active',b.dataset.border===borderStyle));
-  // Visuals
+  
   document.getElementById('cfg-text-color').value=textColor;
   document.getElementById('cfg-glow-color').value=glowColor;
   document.getElementById('cfg-glow-color2').value=glowColor2;
@@ -829,19 +807,19 @@ function openEdit(){
   document.getElementById('cfg-shadow-y').value=shadowY;document.getElementById('shadow-y-val').textContent=shadowY+'px Y';
   document.getElementById('cfg-border-color').value=borderColor;
   document.getElementById('cfg-border-color2').value=borderColor2;
-  // Spotify
+  
   document.getElementById('cfg-spotify').checked=spotifyVisible;
   document.getElementById('spotify-config').style.display=spotifyVisible?'flex':'none';
   document.getElementById('cfg-sp-track').value=spTrack;
   document.getElementById('cfg-sp-artist').value=spArtist;
   document.getElementById('cfg-sp-art').value=spArt;
   document.getElementById('cfg-sp-spin').checked=spSpin;
-  // Ticker
+  
   document.getElementById('cfg-ticker').checked=tickerVisible;
   document.getElementById('ticker-config').style.display=tickerVisible?'flex':'none';
   document.getElementById('cfg-ticker-text').value=tickerTexts.join('\n');
   document.getElementById('cfg-ticker-speed').value=tickerSpeed;document.getElementById('ticker-speed-val').textContent=tickerSpeed+'s';
-  // WS URL prefill
+  
   const savedWs = localStorage.getItem('remote_ws_url');
   if (savedWs) document.getElementById('cfg-ws-url').value = savedWs;
   panel.classList.add('open');
@@ -873,7 +851,7 @@ document.getElementById('save-btn').addEventListener('click',()=>{
   finishEffect=activeFx?activeFx.dataset.effect:'confetti';
   const activeSkin=document.querySelector('#skin-grid .skin-btn.active');
   if(activeSkin)applySkin(activeSkin.dataset.skin);
-  // Visuals
+  
   textColor=document.getElementById('cfg-text-color').value;
   glowColor=document.getElementById('cfg-glow-color').value;
   glowColor2=document.getElementById('cfg-glow-color2').value;
@@ -888,14 +866,14 @@ document.getElementById('save-btn').addEventListener('click',()=>{
   borderColor=document.getElementById('cfg-border-color').value;
   borderColor2=document.getElementById('cfg-border-color2').value;
   applyVisuals();
-  // Spotify
+  
   spotifyVisible=document.getElementById('cfg-spotify').checked;
   spTrack=document.getElementById('cfg-sp-track').value.trim();
   spArtist=document.getElementById('cfg-sp-artist').value.trim();
   spArt=document.getElementById('cfg-sp-art').value.trim();
   spSpin=document.getElementById('cfg-sp-spin').checked;
   updateSpotify();
-  // Ticker
+  
   tickerVisible=document.getElementById('cfg-ticker').checked;
   tickerTexts=document.getElementById('cfg-ticker-text').value.split('\n').map(t=>t.trim()).filter(Boolean);
   tickerSpeed=parseInt(document.getElementById('cfg-ticker-speed').value)||60;
@@ -915,7 +893,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='n'||e.key==='N'){e.preventDefault();nextTrack();}
 });
 
-// ══ FINISH FX ══
 let fxParticles=[],fxAnimFrame=null,fxRunning=false;
 function clearFinishFX(){fxRunning=false;if(fxAnimFrame){cancelAnimationFrame(fxAnimFrame);fxAnimFrame=null;}fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);fxParticles=[];}
 function triggerFinishFX(){
@@ -935,7 +912,6 @@ function triggerFinishFX(){
   else if(finishEffect==='fire'){const GW=Math.ceil(W/8),GH=Math.ceil(H/8),grid=new Float32Array(GW*GH);setTimeout(()=>{fxRunning=false;},5000);(function doFire(){for(let x=0;x<GW;x++)grid[(GH-1)*GW+x]=Math.random()>.25?1:0;for(let y=0;y<GH-1;y++)for(let x=0;x<GW;x++){const bx=Math.min(GW-1,Math.max(0,x+(Math.random()*3|0)-1));grid[y*GW+x]=grid[(y+1)*GW+bx]*(.86+Math.random()*.06);}fxCtx.clearRect(0,0,W,H);for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){const v=grid[y*GW+x];if(v<.05)continue;fxCtx.fillStyle=`rgba(${Math.min(255,v*510)|0},${Math.max(0,v*255-80)|0},0,${v*.88})`;fxCtx.fillRect(x*8,y*8,9,9);}if(fxRunning)fxAnimFrame=requestAnimationFrame(doFire);else fxCtx.clearRect(0,0,W,H);})();}
 }
 
-// ══ BG FX ══
 let bgParticles=[],bgAnimFrame=null,bgRunning=false,bgT=0;
 function clearBg(){bgRunning=false;if(bgAnimFrame){cancelAnimationFrame(bgAnimFrame);bgAnimFrame=null;}bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);bgParticles=[];}
 function hslToRgb(h,s,l){const q=l<.5?l*(1+s):l+s-l*s,pp=2*l-q;return[Math.round(hue2rgb(pp,q,h+1/3)*255),Math.round(hue2rgb(pp,q,h)*255),Math.round(hue2rgb(pp,q,h-1/3)*255)];}
@@ -957,7 +933,6 @@ function initBgEffect(){
   else if(bgEffect==='rainbow'){(function anim(){bgT+=.008;bgCtx.clearRect(0,0,W,H);for(let i=0;i<7;i++){const grd=bgCtx.createLinearGradient(0,0,W,H);grd.addColorStop(0,`hsla(${(i*51+bgT*60)%360},100%,55%,0)`);grd.addColorStop(.5,`hsla(${(i*51+bgT*60)%360},100%,55%,${.12*intf})`);grd.addColorStop(1,`hsla(${(i*51+bgT*60+60)%360},100%,55%,0)`);bgCtx.save();bgCtx.translate(W/2,H/2);bgCtx.rotate(bgT*.3+i*.44);bgCtx.translate(-W/2,-H/2);bgCtx.fillStyle=grd;bgCtx.fillRect(0,0,W,H);bgCtx.restore();}if(bgRunning)bgAnimFrame=requestAnimationFrame(anim);})();}
 }
 
-// ══ i18n ══
 const i18n = {
   de: {
     s_skin:'🎨 Timer-Skin', s_visuals:'🎨 Visuals & Design', s_timer:'⏱ Timer & Modus',
@@ -1026,23 +1001,23 @@ let currentLang = 'de';
 function setLang(lang) {
   currentLang = lang;
   const t = i18n[lang];
-  // Section titles & labels
+  
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     if (t[key] !== undefined) el.textContent = t[key];
   });
-  // Placeholders
+  
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.dataset.i18nPlaceholder;
     if (t[key] !== undefined) el.placeholder = t[key];
   });
-  // Video drop zone
+  
   const vdrop = document.getElementById('video-drop');
   if (vdrop) vdrop.innerHTML = `${t.vd_drop}<br><span style="font-size:.62rem;opacity:.5;">${t.vd_sub}</span>`;
-  // GIF drop text (only if no file loaded)
+  
   const gdrop = document.getElementById('gif-drop-text');
   if (gdrop && !document.getElementById('gif-drop').classList.contains('has-file')) gdrop.textContent = t.gif_drop;
-  // Video buttons
+  
   const toggleBtn = document.getElementById('btn-video-toggle');
   if (toggleBtn) toggleBtn.textContent = videoActive ? t.btn_deactivate : t.btn_activate;
   const restartBtn = document.getElementById('btn-video-restart');
@@ -1053,7 +1028,7 @@ function setLang(lang) {
   if (removeAllBtn) removeAllBtn.textContent = t.btn_removeall;
   const gifRemoveBtn = document.getElementById('btn-gif-remove');
   if (gifRemoveBtn) gifRemoveBtn.textContent = t.btn_gifremove;
-  // Lang buttons styling
+  
   document.querySelectorAll('.lang-btn').forEach(b => {
     const active = b.dataset.lang === lang;
     b.style.background = active ? 'rgba(100,180,255,.22)' : 'rgba(255,255,255,.05)';
@@ -1062,12 +1037,10 @@ function setLang(lang) {
   });
 }
 
-// Lang button clicks
 document.querySelectorAll('.lang-btn').forEach(btn => {
   btn.addEventListener('click', () => setLang(btn.dataset.lang));
 });
 
-// ══ WebSocket Remote Control ══
 let remoteWs = null;
 let remoteReconnect = null;
 
@@ -1133,10 +1106,8 @@ function handleRemoteCmd(data) {
   broadcastState();
 }
 
-// State every second for live clock sync on remote
 setInterval(() => { if (remoteWs && remoteWs.readyState === WebSocket.OPEN) broadcastState(); }, 1000);
 
-// Auto-connect if URL saved
 const savedRemoteUrl = localStorage.getItem('remote_ws_url');
 if (savedRemoteUrl) remoteConnect(savedRemoteUrl);
 
