@@ -198,15 +198,21 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
   <div id="ticker-inner"></div>
 </div>
 
-<button id="video-quick-toggle" style="display:none;position:fixed;top:16px;right:16px;z-index:30;padding:8px 14px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.5);font-family:'Space Mono',monospace;font-size:.67rem;cursor:pointer;letter-spacing:.08em;transition:all .2s;">🎬 VIDEO: AUS</button>
+
 
 <!-- ══ PANEL ══ -->
 <div id="edit-panel">
  <div id="panel-box">
-  <h2>⚙ Stream Timer Ultimate</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+    <h2 style="margin:0;">⚙ Stream Timer</h2>
+    <div style="display:flex;gap:6px;">
+      <div class="lang-btn active" data-lang="de" style="padding:5px 11px;border-radius:8px;font-family:'Space Mono',monospace;font-size:.68rem;cursor:pointer;border:1px solid rgba(100,180,255,.5);background:rgba(100,180,255,.22);color:#fff;letter-spacing:.05em;">🇩🇪 DE</div>
+      <div class="lang-btn" data-lang="en" style="padding:5px 11px;border-radius:8px;font-family:'Space Mono',monospace;font-size:.68rem;cursor:pointer;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:rgba(255,255,255,.45);letter-spacing:.05em;">🇬🇧 EN</div>
+    </div>
+  </div>
 
   <!-- SKIN -->
-  <div class="section-title">🎨 Timer-Skin</div>
+  <div class="section-title" data-i18n="s_skin">🎨 Timer-Skin</div>
   <div class="skin-preview-grid" id="skin-grid">
     <div class="skin-btn active" data-skin="default">🌌<br>Default</div>
     <div class="skin-btn" data-skin="neon">⚡<br>Neon</div>
@@ -216,9 +222,9 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
   </div>
 
   <!-- VISUALS -->
-  <div class="section-title">🎨 Visuals & Design</div>
+  <div class="section-title" data-i18n="s_visuals">🎨 Visuals & Design</div>
   <div class="row">
-    <label>Schriftfarbe & Glow-Farbe</label>
+    <label data-i18n="l_textcolor">Schriftfarbe & Glow-Farbe</label>
     <div class="color-row">
       <input type="color" id="cfg-text-color" value="#ffffff">
       <span>Schrift</span>
@@ -229,21 +235,21 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     </div>
   </div>
   <div class="row">
-    <label>Timer-Größe</label>
+    <label data-i18n="l_fontsize">Timer-Größe</label>
     <div class="range-wrap">
       <input type="range" id="cfg-font-size" min="40" max="300" value="150">
       <span id="font-size-val">150px</span>
     </div>
   </div>
   <div class="row">
-    <label>Glow-Stärke</label>
+    <label data-i18n="l_glowstrength">Glow-Stärke</label>
     <div class="range-wrap">
       <input type="range" id="cfg-glow-strength" min="0" max="100" value="60">
       <span id="glow-strength-val">60</span>
     </div>
   </div>
   <div class="row">
-    <label>Drop-Shadow</label>
+    <label data-i18n="l_shadow">Drop-Shadow</label>
     <div class="color-row">
       <input type="color" id="cfg-shadow-color" value="#000000">
       <span>Farbe</span>
@@ -262,7 +268,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     </div>
   </div>
   <div class="row">
-    <label>Animierter Rahmen</label>
+    <label data-i18n="l_border">Animierter Rahmen</label>
     <div class="effect-grid" id="border-grid" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
       <div class="effect-btn active" data-border="none">🚫 Kein</div>
       <div class="effect-btn" data-border="glow">✨ Glow</div>
@@ -279,26 +285,26 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
   </div>
 
   <!-- TIMER -->
-  <div class="section-title">⏱ Timer & Modus</div>
+  <div class="section-title" data-i18n="s_timer">⏱ Timer & Modus</div>
   <div class="row">
-    <label>Modus</label>
+    <label data-i18n="l_mode">Modus</label>
     <div class="mode-grid" id="mode-grid">
-      <div class="mode-btn active" data-mode="countdown">⬇ Countdown</div>
-      <div class="mode-btn" data-mode="countup">⏱ Stoppuhr</div>
-      <div class="mode-btn" data-mode="loop">🔄 Loop</div>
-      <div class="mode-btn" data-mode="clock">⏰ Uhrzeit</div>
+      <div class="mode-btn active" data-mode="countdown" data-i18n="m_countdown">⬇ Countdown</div>
+      <div class="mode-btn" data-mode="countup" data-i18n="m_countup">⏱ Stoppuhr</div>
+      <div class="mode-btn" data-mode="loop" data-i18n="m_loop">🔄 Loop</div>
+      <div class="mode-btn" data-mode="clock" data-i18n="m_clock">⏰ Uhrzeit</div>
     </div>
   </div>
   <div class="row" id="time-inputs-row">
-    <label>Zeit</label>
+    <label data-i18n="l_time">Zeit</label>
     <div class="time-row">
-      <div class="col"><label>Std</label><input type="number" id="cfg-h" value="0" min="0" max="23"></div>
-      <div class="col"><label>Min</label><input type="number" id="cfg-m" value="5" min="0" max="59"></div>
-      <div class="col"><label>Sek</label><input type="number" id="cfg-s" value="0" min="0" max="59"></div>
+      <div class="col"><label data-i18n="l_h">Std</label><input type="number" id="cfg-h" value="0" min="0" max="23"></div>
+      <div class="col"><label data-i18n="l_m">Min</label><input type="number" id="cfg-m" value="5" min="0" max="59"></div>
+      <div class="col"><label data-i18n="l_s">Sek</label><input type="number" id="cfg-s" value="0" min="0" max="59"></div>
     </div>
   </div>
   <div class="row" id="utc-row" style="display:none">
-    <label>🌍 Zeitzone</label>
+    <label data-i18n="l_timezone">🌍 Zeitzone</label>
     <div class="effect-grid" id="utc-grid">
       <div class="effect-btn" data-utc="-12">UTC-12</div>
       <div class="effect-btn" data-utc="-11">UTC-11</div>
@@ -324,15 +330,15 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     </div>
   </div>
   <div class="row">
-    <label>Label über dem Timer</label>
-    <input type="text" id="cfg-label" placeholder="z.B. STREAM STARTET IN">
+    <label data-i18n="l_label">Label über dem Timer</label>
+    <input type="text" id="cfg-label" data-i18n-placeholder="ph_label" placeholder="z.B. STREAM STARTET IN">
   </div>
   <div class="checkbox-row">
     <input type="checkbox" id="cfg-bar" checked>
-    <span>Fortschrittsbalken anzeigen</span>
+    <span data-i18n="cb_bar">Fortschrittsbalken anzeigen</span>
   </div>
   <div class="row">
-    <label>Balken-Farbe</label>
+    <label data-i18n="l_barcolor">Balken-Farbe</label>
     <div class="color-row">
       <input type="color" id="cfg-bar-color" value="#44aaff">
       <input type="color" id="cfg-bar-color2" value="#ffffff">
@@ -341,15 +347,15 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
   </div>
   <div class="checkbox-row">
     <input type="checkbox" id="cfg-autofinish">
-    <span>Bei 00:00 automatisch stoppen</span>
+    <span data-i18n="cb_autofinish">Bei 00:00 automatisch stoppen</span>
   </div>
   <div class="row">
-    <label>Text bei 00:00</label>
-    <input type="text" id="cfg-finish-text" placeholder="z.B. Stream startet sofort!">
+    <label data-i18n="l_finishtext">Text bei 00:00</label>
+    <input type="text" id="cfg-finish-text" data-i18n-placeholder="ph_finishtext" placeholder="z.B. Stream startet sofort!">
   </div>
 
   <!-- FINISH FX -->
-  <div class="section-title">🎆 Finish-Effekt bei 00:00</div>
+  <div class="section-title" data-i18n="s_finishfx">🎆 Finish-Effekt bei 00:00</div>
   <div class="effect-grid" id="finish-effect-grid">
     <div class="effect-btn" data-effect="none">🚫 Keiner</div>
     <div class="effect-btn active" data-effect="confetti">🎊 Konfetti</div>
@@ -367,7 +373,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
   </div>
 
   <!-- BG FX -->
-  <div class="section-title">🌌 Hintergrund-Effekt</div>
+  <div class="section-title" data-i18n="s_bgfx">🌌 Hintergrund-Effekt</div>
   <div class="effect-grid" id="bg-effect-grid">
     <div class="effect-btn active" data-bgeffect="none">🚫 Keiner</div>
     <div class="effect-btn" data-bgeffect="stars">⭐ Sterne</div>
@@ -384,7 +390,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     <div class="effect-btn" data-bgeffect="rainbow">🌈 Regenbogen</div>
   </div>
   <div class="row">
-    <label>Intensität</label>
+    <label data-i18n="l_intensity">Intensität</label>
     <div class="range-wrap">
       <input type="range" id="cfg-bg-intensity" min="10" max="100" value="50">
       <span id="bg-intensity-val">50</span>
@@ -392,7 +398,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
   </div>
 
   <!-- VIDEO PLAYLIST -->
-  <div class="section-title">🎬 Video-Hintergrund (Playlist)</div>
+  <div class="section-title" data-i18n="s_video">🎬 Video-Hintergrund (Playlist)</div>
   <div id="video-drop" onclick="document.getElementById('video-file').click()">
     📂 Videos hinzufügen (MP4, WebM, MOV)<br><span style="font-size:.62rem;opacity:.5;">Mehrere Videos = automatische Playlist</span>
   </div>
@@ -405,7 +411,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     <button class="small-btn" id="btn-video-remove-all">✕ Alle entfernen</button>
   </div>
   <div class="row" id="video-opacity-row" style="display:none">
-    <label>Video-Deckkraft</label>
+    <label data-i18n="l_videoopacity">Video-Deckkraft</label>
     <div class="range-wrap">
       <input type="range" id="cfg-video-opacity" min="5" max="100" value="100">
       <span id="video-opacity-val">100%</span>
@@ -414,20 +420,20 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
   <div id="video-loop-row" style="display:none;flex-direction:column;gap:8px;">
     <div class="checkbox-row">
       <input type="checkbox" id="cfg-video-loop" checked>
-      <span>Playlist wiederholen (endlos loopen)</span>
+      <span data-i18n="cb_videoloop">Playlist wiederholen (endlos loopen)</span>
     </div>
     <div class="checkbox-row">
       <input type="checkbox" id="cfg-video-shuffle">
-      <span>Zufällige Reihenfolge (Shuffle)</span>
+      <span data-i18n="cb_videoshuffle">Zufällige Reihenfolge (Shuffle)</span>
     </div>
     <div class="checkbox-row">
       <input type="checkbox" id="cfg-video-mute" checked>
-      <span>Video stummschalten</span>
+      <span data-i18n="cb_videomute">Video stummschalten</span>
     </div>
   </div>
 
   <!-- GIF -->
-  <div class="section-title">🎞 GIF-Hintergrund</div>
+  <div class="section-title" data-i18n="s_gif">🎞 GIF-Hintergrund</div>
   <div id="gif-drop" onclick="document.getElementById('gif-file').click()">
     <span id="gif-drop-text">📂 GIF auswählen</span>
   </div>
@@ -438,7 +444,7 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     <span id="gif-name" style="font-size:.66rem;color:rgba(255,255,255,.36);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
   </div>
   <div class="row" id="gif-opacity-row" style="display:none">
-    <label>GIF-Deckkraft</label>
+    <label data-i18n="l_gifopacity">GIF-Deckkraft</label>
     <div class="range-wrap">
       <input type="range" id="cfg-gif-opacity" min="5" max="100" value="80">
       <span id="gif-opacity-val">80%</span>
@@ -446,31 +452,31 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
   </div>
 
   <!-- SPOTIFY -->
-  <div class="section-title">🎧 Spotify „Now Playing" Widget</div>
+  <div class="section-title" data-i18n="s_spotify">🎧 Spotify „Now Playing" Widget</div>
   <div class="checkbox-row">
     <input type="checkbox" id="cfg-spotify">
-    <span>Widget anzeigen</span>
+    <span data-i18n="cb_spotify">Widget anzeigen</span>
   </div>
   <div id="spotify-config" style="display:none;flex-direction:column;gap:10px;">
-    <div class="row"><label>Aktueller Titel</label><input type="text" id="cfg-sp-track" placeholder="z.B. Blinding Lights"></div>
-    <div class="row"><label>Künstler</label><input type="text" id="cfg-sp-artist" placeholder="z.B. The Weeknd"></div>
-    <div class="row"><label>Album Cover URL (optional)</label><input type="text" id="cfg-sp-art" placeholder="https://...jpg"></div>
-    <div class="checkbox-row"><input type="checkbox" id="cfg-sp-spin"><span>Cover dreht sich (Vinyl-Style)</span></div>
+    <div class="row"><label data-i18n="l_sptrack">Aktueller Titel</label><input type="text" id="cfg-sp-track" data-i18n-placeholder="ph_sptrack" placeholder="z.B. Blinding Lights"></div>
+    <div class="row"><label data-i18n="l_spartist">Künstler</label><input type="text" id="cfg-sp-artist" data-i18n-placeholder="ph_spartist" placeholder="z.B. The Weeknd"></div>
+    <div class="row"><label data-i18n="l_spart">Album Cover URL (optional)</label><input type="text" id="cfg-sp-art" placeholder="https://...jpg"></div>
+    <div class="checkbox-row"><input type="checkbox" id="cfg-sp-spin"><span data-i18n="cb_spspin">Cover dreht sich (Vinyl-Style)</span></div>
   </div>
 
   <!-- TICKER -->
-  <div class="section-title">📝 News-Ticker</div>
+  <div class="section-title" data-i18n="s_ticker">📝 News-Ticker</div>
   <div class="checkbox-row">
     <input type="checkbox" id="cfg-ticker">
-    <span>Ticker anzeigen</span>
+    <span data-i18n="cb_ticker">Ticker anzeigen</span>
   </div>
   <div id="ticker-config" style="display:none;flex-direction:column;gap:10px;">
     <div class="row">
-      <label>Ticker-Texte (eine Zeile = ein Text)</label>
-      <textarea id="cfg-ticker-text" rows="4" placeholder="Stream startet gleich!&#10;Discord: discord.gg/daenru&#10;Folgt uns auf TikTok!"></textarea>
+      <label data-i18n="l_tickertexts">Ticker-Texte (eine Zeile = ein Text)</label>
+      <textarea id="cfg-ticker-text" rows="4" data-i18n-placeholder="ph_ticker" placeholder="Stream startet gleich!&#10;Discord: discord.gg/daenru&#10;Folgt uns auf TikTok!"></textarea>
     </div>
     <div class="row">
-      <label>Geschwindigkeit</label>
+      <label data-i18n="l_tickerspeed">Geschwindigkeit</label>
       <div class="range-wrap">
         <input type="range" id="cfg-ticker-speed" min="10" max="200" value="60">
         <span id="ticker-speed-val">60s</span>
@@ -478,7 +484,19 @@ body.skin-brutal .ticker-sep{color:rgba(0,0,0,.4);}
     </div>
   </div>
 
-  <button id="save-btn">✓ Übernehmen &amp; Schließen</button>
+  <button id="save-btn" data-i18n="btn_save">✓ Übernehmen &amp; Schließen</button>
+
+  <!-- REMOTE -->
+  <div class="section-title">📡 Remote Control</div>
+  <div class="row">
+    <label>WebSocket Server URL</label>
+    <input type="text" id="cfg-ws-url" placeholder="ws://192.168.x.x:8765">
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="small-btn blue" id="btn-ws-connect" style="flex:1;padding:9px;">🔗 Verbinden</button>
+    <button class="small-btn" id="btn-ws-disconnect" style="flex:1;padding:9px;">✕ Trennen</button>
+  </div>
+  <div id="ws-status" style="font-size:.65rem;color:rgba(255,255,255,.35);letter-spacing:.08em;text-align:center;">⬤ Nicht verbunden</div>
  </div>
 </div>
 
@@ -617,7 +635,6 @@ function renderPlaylist(){
   document.getElementById('video-controls').style.display=hasItems?'flex':'none';
   document.getElementById('video-opacity-row').style.display=hasItems?'':'none';
   document.getElementById('video-loop-row').style.display=hasItems?'flex':'none';
-  document.getElementById('video-quick-toggle').style.display=hasItems?'':'none';
 }
 
 function removePlaylistItem(i){
@@ -654,12 +671,8 @@ function nextTrack(){
 bgVideo.addEventListener('ended',()=>{if(playlist.length>1)nextTrack();else if(videoLoop){bgVideo.currentTime=0;bgVideo.play();}});
 
 function syncVideoBtn(){
-  const btn=document.getElementById('video-quick-toggle');
   const toggleBtn=document.getElementById('btn-video-toggle');
-  btn.textContent=videoActive?'🎬 VIDEO: AN':'🎬 VIDEO: AUS';
-  btn.style.borderColor=videoActive?'rgba(80,220,140,.5)':'rgba(255,255,255,.2)';
-  btn.style.color=videoActive?'rgba(80,220,140,.9)':'rgba(255,255,255,.5)';
-  toggleBtn.textContent=videoActive?'⏸ Deaktivieren':'▶ Aktivieren';
+  toggleBtn.textContent=videoActive?i18n[currentLang].btn_deactivate:i18n[currentLang].btn_activate;
 }
 
 function toggleVideo(){
@@ -680,7 +693,6 @@ document.getElementById('video-file').addEventListener('change',function(){
   this.value='';
 });
 document.getElementById('btn-video-toggle').addEventListener('click',toggleVideo);
-document.getElementById('video-quick-toggle').addEventListener('click',toggleVideo);
 document.getElementById('btn-video-restart').addEventListener('click',()=>{if(playlist.length===0)return;bgVideo.currentTime=0;if(!videoActive){videoActive=true;bgVideo.classList.add('active');syncVideoBtn();}bgVideo.play();});
 document.getElementById('btn-video-next').addEventListener('click',nextTrack);
 document.getElementById('btn-video-remove-all').addEventListener('click',()=>{playlist.forEach(i=>URL.revokeObjectURL(i.url));playlist=[];currentTrack=0;videoActive=false;bgVideo.classList.remove('active');bgVideo.src='';renderPlaylist();syncVideoBtn();});
@@ -746,6 +758,41 @@ document.getElementById('mode-grid').addEventListener('click',e=>{
 });
 
 // ── Open/Close ──
+// ── WebSocket panel buttons ──
+document.getElementById('btn-ws-connect').addEventListener('click', () => {
+  const url = document.getElementById('cfg-ws-url').value.trim();
+  if (!url) return;
+  localStorage.setItem('remote_ws_url', url);
+  if (remoteReconnect) { clearTimeout(remoteReconnect); remoteReconnect = null; }
+  remoteConnect(url);
+  document.getElementById('ws-status').textContent = '⬤ Verbinde...';
+  document.getElementById('ws-status').style.color = 'rgba(255,200,80,.7)';
+});
+document.getElementById('btn-ws-disconnect').addEventListener('click', () => {
+  if (remoteReconnect) { clearTimeout(remoteReconnect); remoteReconnect = null; }
+  if (remoteWs) { remoteWs.onclose = null; remoteWs.close(); remoteWs = null; }
+  localStorage.removeItem('remote_ws_url');
+  document.getElementById('ws-status').textContent = '⬤ Nicht verbunden';
+  document.getElementById('ws-status').style.color = 'rgba(255,255,255,.35)';
+});
+
+// Update WS status indicator
+setInterval(() => {
+  const el = document.getElementById('ws-status');
+  if (!el) return;
+  if (remoteWs && remoteWs.readyState === WebSocket.OPEN) {
+    el.textContent = '⬤ Verbunden ✓';
+    el.style.color = 'rgba(80,220,140,.8)';
+  } else if (remoteWs && remoteWs.readyState === WebSocket.CONNECTING) {
+    el.textContent = '⬤ Verbinde...';
+    el.style.color = 'rgba(255,200,80,.7)';
+  } else {
+    el.textContent = '⬤ Nicht verbunden';
+    el.style.color = 'rgba(255,255,255,.35)';
+  }
+}, 1000);
+
+// Prefill WS URL in panel
 function openEdit(){
   editOpen=true;if(running&&mode!=='clock')pause();
   const h=Math.floor(totalSeconds/3600),m=Math.floor((totalSeconds%3600)/60),s=totalSeconds%60;
@@ -794,6 +841,9 @@ function openEdit(){
   document.getElementById('ticker-config').style.display=tickerVisible?'flex':'none';
   document.getElementById('cfg-ticker-text').value=tickerTexts.join('\n');
   document.getElementById('cfg-ticker-speed').value=tickerSpeed;document.getElementById('ticker-speed-val').textContent=tickerSpeed+'s';
+  // WS URL prefill
+  const savedWs = localStorage.getItem('remote_ws_url');
+  if (savedWs) document.getElementById('cfg-ws-url').value = savedWs;
   panel.classList.add('open');
 }
 function closeEdit(){editOpen=false;panel.classList.remove('open');}
@@ -906,6 +956,189 @@ function initBgEffect(){
   else if(bgEffect==='matrixbg'){const cols=Math.floor(W/16),drops=new Array(cols).fill(0).map(()=>Math.random()*50),chars='アイウエオ01ﾊﾐﾋｱｳSELECT{}[]<>';(function anim(){bgCtx.fillStyle=`rgba(0,0,0,${.08/intf})`;bgCtx.fillRect(0,0,W,H);bgCtx.font='13px monospace';drops.forEach((y,i)=>{bgCtx.fillStyle=`rgba(0,${180+Math.random()*75|0},0,${intf})`;bgCtx.fillText(chars[Math.floor(Math.random()*chars.length)],i*16,y*16);if(y*16>H&&Math.random()>.975)drops[i]=0;drops[i]+=.5;});if(bgRunning)bgAnimFrame=requestAnimationFrame(anim);})();}
   else if(bgEffect==='rainbow'){(function anim(){bgT+=.008;bgCtx.clearRect(0,0,W,H);for(let i=0;i<7;i++){const grd=bgCtx.createLinearGradient(0,0,W,H);grd.addColorStop(0,`hsla(${(i*51+bgT*60)%360},100%,55%,0)`);grd.addColorStop(.5,`hsla(${(i*51+bgT*60)%360},100%,55%,${.12*intf})`);grd.addColorStop(1,`hsla(${(i*51+bgT*60+60)%360},100%,55%,0)`);bgCtx.save();bgCtx.translate(W/2,H/2);bgCtx.rotate(bgT*.3+i*.44);bgCtx.translate(-W/2,-H/2);bgCtx.fillStyle=grd;bgCtx.fillRect(0,0,W,H);bgCtx.restore();}if(bgRunning)bgAnimFrame=requestAnimationFrame(anim);})();}
 }
+
+// ══ i18n ══
+const i18n = {
+  de: {
+    s_skin:'🎨 Timer-Skin', s_visuals:'🎨 Visuals & Design', s_timer:'⏱ Timer & Modus',
+    s_finishfx:'🎆 Finish-Effekt bei 00:00', s_bgfx:'🌌 Hintergrund-Effekt',
+    s_video:'🎬 Video-Hintergrund (Playlist)', s_gif:'🎞 GIF-Hintergrund',
+    s_spotify:'🎧 Spotify „Now Playing" Widget', s_ticker:'📝 News-Ticker',
+    l_textcolor:'Schriftfarbe & Glow-Farbe', l_fontsize:'Timer-Größe',
+    l_glowstrength:'Glow-Stärke', l_shadow:'Drop-Shadow', l_border:'Animierter Rahmen',
+    l_mode:'Modus', l_time:'Zeit', l_h:'Std', l_m:'Min', l_s:'Sek',
+    l_timezone:'🌍 Zeitzone', l_label:'Label über dem Timer',
+    l_barcolor:'Balken-Farbe', l_finishtext:'Text bei 00:00',
+    l_intensity:'Intensität', l_videoopacity:'Video-Deckkraft',
+    l_gifopacity:'GIF-Deckkraft', l_sptrack:'Aktueller Titel',
+    l_spartist:'Künstler', l_spart:'Album Cover URL (optional)',
+    l_tickertexts:'Ticker-Texte (eine Zeile = ein Text)', l_tickerspeed:'Geschwindigkeit',
+    cb_bar:'Fortschrittsbalken anzeigen', cb_autofinish:'Bei 00:00 automatisch stoppen',
+    cb_videoloop:'Playlist wiederholen (endlos loopen)',
+    cb_videoshuffle:'Zufällige Reihenfolge (Shuffle)', cb_videomute:'Video stummschalten',
+    cb_spotify:'Widget anzeigen', cb_spspin:'Cover dreht sich (Vinyl-Style)',
+    cb_ticker:'Ticker anzeigen',
+    m_countdown:'⬇ Countdown', m_countup:'⏱ Stoppuhr', m_loop:'🔄 Loop', m_clock:'⏰ Uhrzeit',
+    btn_save:'✓ Übernehmen & Schließen',
+    ph_label:'z.B. STREAM STARTET IN', ph_finishtext:'z.B. Stream startet sofort!',
+    ph_sptrack:'z.B. Blinding Lights', ph_spartist:'z.B. The Weeknd',
+    ph_ticker:'Stream startet gleich!\nDiscord: discord.gg/daenru\nFollt uns auf TikTok!',
+    vd_drop:'📂 Videos hinzufügen (MP4, WebM, MOV)', vd_sub:'Mehrere Videos = automatische Playlist',
+    gif_drop:'📂 GIF auswählen',
+    btn_activate:'▶ Aktivieren', btn_deactivate:'⏸ Deaktivieren',
+    btn_restart:'⏮ Neu starten', btn_next:'⏭ Nächstes', btn_removeall:'✕ Alle entfernen',
+    btn_gifremove:'✕ Entfernen',
+  },
+  en: {
+    s_skin:'🎨 Timer Skin', s_visuals:'🎨 Visuals & Design', s_timer:'⏱ Timer & Mode',
+    s_finishfx:'🎆 Finish Effect at 00:00', s_bgfx:'🌌 Background Effect',
+    s_video:'🎬 Video Background (Playlist)', s_gif:'🎞 GIF Background',
+    s_spotify:'🎧 Spotify „Now Playing" Widget', s_ticker:'📝 News Ticker',
+    l_textcolor:'Font Color & Glow Color', l_fontsize:'Timer Size',
+    l_glowstrength:'Glow Intensity', l_shadow:'Drop Shadow', l_border:'Animated Border',
+    l_mode:'Mode', l_time:'Time', l_h:'Hrs', l_m:'Min', l_s:'Sec',
+    l_timezone:'🌍 Timezone', l_label:'Label above Timer',
+    l_barcolor:'Bar Color', l_finishtext:'Text at 00:00',
+    l_intensity:'Intensity', l_videoopacity:'Video Opacity',
+    l_gifopacity:'GIF Opacity', l_sptrack:'Current Track',
+    l_spartist:'Artist', l_spart:'Album Cover URL (optional)',
+    l_tickertexts:'Ticker Texts (one line = one message)', l_tickerspeed:'Speed',
+    cb_bar:'Show progress bar', cb_autofinish:'Auto-stop at 00:00',
+    cb_videoloop:'Loop playlist (repeat endlessly)',
+    cb_videoshuffle:'Random order (Shuffle)', cb_videomute:'Mute video',
+    cb_spotify:'Show widget', cb_spspin:'Cover spins (Vinyl style)',
+    cb_ticker:'Show ticker',
+    m_countdown:'⬇ Countdown', m_countup:'⏱ Stopwatch', m_loop:'🔄 Loop', m_clock:'⏰ Clock',
+    btn_save:'✓ Apply & Close',
+    ph_label:'e.g. STREAM STARTING IN', ph_finishtext:'e.g. Stream starts now!',
+    ph_sptrack:'e.g. Blinding Lights', ph_spartist:'e.g. The Weeknd',
+    ph_ticker:'Stream starting soon!\nDiscord: discord.gg/daenru\nFollow us on TikTok!',
+    vd_drop:'📂 Add videos (MP4, WebM, MOV)', vd_sub:'Multiple videos = automatic playlist',
+    gif_drop:'📂 Select GIF',
+    btn_activate:'▶ Enable', btn_deactivate:'⏸ Disable',
+    btn_restart:'⏮ Restart', btn_next:'⏭ Next', btn_removeall:'✕ Remove all',
+    btn_gifremove:'✕ Remove',
+  }
+};
+
+let currentLang = 'de';
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = i18n[lang];
+  // Section titles & labels
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key] !== undefined) el.textContent = t[key];
+  });
+  // Placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (t[key] !== undefined) el.placeholder = t[key];
+  });
+  // Video drop zone
+  const vdrop = document.getElementById('video-drop');
+  if (vdrop) vdrop.innerHTML = `${t.vd_drop}<br><span style="font-size:.62rem;opacity:.5;">${t.vd_sub}</span>`;
+  // GIF drop text (only if no file loaded)
+  const gdrop = document.getElementById('gif-drop-text');
+  if (gdrop && !document.getElementById('gif-drop').classList.contains('has-file')) gdrop.textContent = t.gif_drop;
+  // Video buttons
+  const toggleBtn = document.getElementById('btn-video-toggle');
+  if (toggleBtn) toggleBtn.textContent = videoActive ? t.btn_deactivate : t.btn_activate;
+  const restartBtn = document.getElementById('btn-video-restart');
+  if (restartBtn) restartBtn.textContent = t.btn_restart;
+  const nextBtn = document.getElementById('btn-video-next');
+  if (nextBtn) nextBtn.textContent = t.btn_next;
+  const removeAllBtn = document.getElementById('btn-video-remove-all');
+  if (removeAllBtn) removeAllBtn.textContent = t.btn_removeall;
+  const gifRemoveBtn = document.getElementById('btn-gif-remove');
+  if (gifRemoveBtn) gifRemoveBtn.textContent = t.btn_gifremove;
+  // Lang buttons styling
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    const active = b.dataset.lang === lang;
+    b.style.background = active ? 'rgba(100,180,255,.22)' : 'rgba(255,255,255,.05)';
+    b.style.borderColor = active ? 'rgba(100,180,255,.5)' : 'rgba(255,255,255,.14)';
+    b.style.color = active ? '#fff' : 'rgba(255,255,255,.45)';
+  });
+}
+
+// Lang button clicks
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => setLang(btn.dataset.lang));
+});
+
+// ══ WebSocket Remote Control ══
+let remoteWs = null;
+let remoteReconnect = null;
+
+function remoteConnect(url) {
+  if (remoteWs) { try { remoteWs.close(); } catch {} }
+  try { remoteWs = new WebSocket(url); } catch { return; }
+  remoteWs.onopen = () => { broadcastState(); };
+  remoteWs.onmessage = (e) => {
+    try { handleRemoteCmd(JSON.parse(e.data)); } catch {}
+  };
+  remoteWs.onclose = () => {
+    remoteReconnect = setTimeout(() => remoteConnect(url), 3000);
+  };
+}
+
+function broadcastState() {
+  if (!remoteWs || remoteWs.readyState !== WebSocket.OPEN) return;
+  const secs = mode === 'countdown' ? remaining : (mode === 'countup' ? countupSecs : remaining);
+  const h = Math.floor(secs/3600), m = Math.floor((secs%3600)/60), s = secs%60;
+  const disp = mode === 'clock' ? fmtClock() :
+               (mode === 'countdown' && remaining === 0 && finishedOnce && finishText) ? finishText :
+               (h > 0 ? `${p(h)}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`);
+  remoteWs.send(JSON.stringify({
+    type: 'state', display: disp, running, mode,
+    finished: mode === 'countdown' && remaining === 0 && finishedOnce,
+    loopCount, skin: currentSkin, finishEffect, bgEffect
+  }));
+}
+
+function handleRemoteCmd(data) {
+  switch(data.cmd) {
+    case 'play':    start(); break;
+    case 'pause':   pause(); break;
+    case 'toggle':  toggle(); break;
+    case 'reset':   reset(); break;
+    case 'get_state': broadcastState(); break;
+    case 'trigger_fx': triggerFinishFX(); break;
+    case 'video_toggle': toggleVideo(); break;
+    case 'video_restart':
+      bgVideo.currentTime = 0;
+      if (!videoActive) { videoActive = true; bgVideo.classList.add('active'); syncVideoBtn(); }
+      bgVideo.play(); break;
+    case 'video_next': nextTrack(); break;
+    case 'set_time':
+      totalSeconds = (data.h||0)*3600 + (data.m||0)*60 + (data.s||0);
+      remaining = totalSeconds; countupSecs = 0; finishedOnce = false; loopCount = 0;
+      clearFinishFX(); render(); break;
+    case 'set_label':
+      labelEl.textContent = data.value || '';
+      labelEl.classList.toggle('visible', !!(data.value)); break;
+    case 'set_finish_text': finishText = data.value || ''; break;
+    case 'set_mode':
+      if (data.mode !== mode) {
+        stop(); mode = data.mode;
+        if (mode === 'clock') { startClock(); running = true; }
+        render();
+      } break;
+    case 'set_finish_effect': finishEffect = data.effect || 'none'; break;
+    case 'set_bg_effect':
+      if (data.effect !== bgEffect) { bgEffect = data.effect || 'none'; initBgEffect(); } break;
+    case 'set_skin': applySkin(data.skin || 'default'); break;
+  }
+  broadcastState();
+}
+
+// State every second for live clock sync on remote
+setInterval(() => { if (remoteWs && remoteWs.readyState === WebSocket.OPEN) broadcastState(); }, 1000);
+
+// Auto-connect if URL saved
+const savedRemoteUrl = localStorage.getItem('remote_ws_url');
+if (savedRemoteUrl) remoteConnect(savedRemoteUrl);
 
 applyVisuals();
 render();
