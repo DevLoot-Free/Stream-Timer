@@ -1,83 +1,99 @@
-# Stream Timer V2.0.0 🎬
+# Stream Timer 2.0.1
 
-A stream overlay timer that runs as a single HTML file. Transparent background, works directly in OBS as a Browser Source. No install, no setup, just open it and go.
+**v2.0.1** — Browser-based stream overlay timer. Transparent background, OBS-ready, no install needed.
+
+---
+
+## What's new in 2.0.1
+
+- 🎯 **"Until Time" mode** — set a target time like 18:00 and the timer counts down to it automatically
+- 📡 **Remote Control** — control everything from your tablet or phone over local WiFi
+- 🎧 **Spotify Now Playing widget** — show current track on stream
+- 📝 **News ticker** — scrolling messages at the bottom
+- 🇩🇪 🇬🇧 **DE/EN language toggle** in settings panel
+- 🎬 **Video playlist** — multiple videos with loop, shuffle, mute
+- 🎞 **GIF background** support
+- ✨ **Animated border** styles (Glow, Pulse, Spin, Dash)
+- 💥 **5 skins** — Default, Neon, Retro, Minimal, Brutal
+- 🔥 **13 finish effects** + **13 background effects**
 
 ---
 
 ## Files
 
-- `stream_timer.html` — the actual timer, goes into OBS
-- `remote.html` — remote control page for tablet/phone
-- `server.py` — runs on your PC to connect timer and remote
+| File | Description |
+|------|-------------|
+| `stream_timer.html` | Main timer — goes into OBS as Browser Source |
+| `remote.html` | Remote control UI for tablet/phone |
+| `server.py` | WebSocket + HTTP server for remote control |
 
 ---
 
-## What it can do
+## Timer Modes
 
-**Timer modes**
-- Countdown
-- Stopwatch (counts up)
-- Loop (auto-restarts, shows loop count)
-- Clock (shows live time, 21 timezones)
+| Mode | Description |
+|------|-------------|
+| ⬇ Countdown | Counts down to zero |
+| ⏱ Stopwatch | Counts up from zero |
+| 🔄 Loop | Auto-restarts, shows loop count |
+| ⏰ Clock | Shows current live time (21 timezones) |
+| 🎯 Until Time | Counts down to a specific time e.g. 18:00 |
 
-**Visuals**
+---
+
+## Visuals
+
 - 5 skins: Default, Neon, Retro, Minimal, Brutal
-- Custom font color, glow color, glow intensity
-- Resize the timer with a slider
-- Drop shadow with X/Y offset
-- Animated border: Glow, Pulse, Spin, Dash
-- Custom progress bar with gradient colors
-
-**Finish effects** (play when timer hits 00:00)
-
-Confetti, Fireworks, Lightning, Tornado, Explosion, Magic, Tsunami, Matrix, Flash, Waves, Particles, Fire
-
-**Background effects** (loop while timer runs)
-
-Stars, Aurora, Particles, Rain, Pulse, Galaxy, Flames, Plasma, Ocean, Snow, Matrix, Rainbow — all with intensity slider
-
-**Media**
-- Video playlist — add multiple MP4/WebM/MOV files, loops or shuffles automatically
-- GIF background with opacity control
-- Both have opacity sliders
-
-**Extras**
-- Spotify Now Playing widget (manual input, bottom left)
-- News ticker at the bottom with custom messages and speed
-- DE / EN language toggle in the settings panel
+- Custom font color + glow (2 colors, intensity slider)
+- Timer size slider (40px – 300px)
+- Drop shadow (color, blur, X/Y offset)
+- Animated border (Glow, Pulse, Spin, Dash) with 2 custom colors
+- Progress bar with custom gradient
 
 ---
 
-## Keyboard shortcuts
+## Finish Effects (at 00:00)
 
-| Key | What it does |
-|-----|-------------|
-| `#` | Open/close settings |
-| `P` | Start/pause |
+🎊 Confetti · 🎉 Fireworks · ⚡ Lightning · 🌀 Tornado · 💥 Explosion · 🪄 Magic · 🌊 Tsunami · 🔮 Matrix · ⚡ Flash · 〰 Waves · ✨ Particles · 🔥 Fire
+
+## Background Effects
+
+⭐ Stars · 🌈 Aurora · 🔵 Particles · 🌧 Rain · 💜 Pulse · 🌌 Galaxy · 🔥 Flames · ⚡ Plasma · 🌊 Ocean · ❄️ Snow · 💚 Matrix · 🌈 Rainbow
+
+---
+
+## Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `#` | Open / close settings |
+| `P` | Start / pause |
 | `R` | Reset |
 | `V` | Toggle video on/off |
 | `N` | Next video in playlist |
 
 ---
 
-## OBS setup
+## OBS Setup
 
-1. Add a Browser Source in OBS
-2. Tick "Local file" and pick `stream_timer.html`
-3. Set the size to match your canvas (e.g. 1920x1080)
-4. Uncheck "Shutdown source when not visible"
+1. Add a **Browser Source** in OBS
+2. Tick **"Local file"** → select `stream_timer.html`
+3. Set resolution to match your canvas (e.g. 1920×1080)
+4. Uncheck **"Shutdown source when not visible"**
 
-Background is already transparent, no chroma key needed. To click things inside the timer without alt-tabbing, right-click the source → Interact.
+Background is transparent out of the box — no chroma key needed. To click things without switching focus: right-click the source → **Interact**.
 
 ---
 
-## Remote control (tablet/phone)
+## Remote Control
 
-Control the timer from your tablet without anything showing up on stream.
+Control everything from your tablet without anything showing on stream.
 
-**Requirements:** Python 3, same WiFi network on both devices.
+**Requirements:** Python 3 · same WiFi network
 
-**1. Install websockets**
+### Setup
+
+**1. Install dependency**
 ```
 pip install websockets
 ```
@@ -86,52 +102,87 @@ pip install websockets
 ```
 python server.py
 ```
-Your IP will show up in the console — something like `192.168.x.x`. Everyone's IP is different, use whatever yours says.
+Your IP(s) will be listed in the console. Use the one that starts with `192.168.x.x`.
+
+> Everyone's IP is different — use the one shown in your console, not from any example.
 
 **3. Connect the timer**
 
-Open `stream_timer.html` → press `#` → scroll down to Remote Control → paste your IP:
+Open `stream_timer.html` → press `#` → scroll to **Remote Control** → enter:
 ```
 ws://YOUR_IP:8765
 ```
 
 **4. Open the remote on your tablet**
 
-In the browser on your tablet:
+In Firefox on your tablet:
 ```
 http://YOUR_IP:8080/remote.html
 ```
-Then enter the WebSocket URL in the field at the top and hit connect.
+The WebSocket URL is filled in automatically — just tap **Verbinden**.
 
-**Firewall issues?**
+> Use **Firefox** on the tablet. Chrome blocks unencrypted WebSocket connections from HTTP pages.
 
-If the tablet can't connect, run this in CMD as Administrator:
+**Firewall fix (if tablet can't connect)**
+
+Run in CMD as Administrator:
 ```
 netsh advfirewall firewall add rule name="StreamTimer HTTP" protocol=TCP dir=in localport=8080 action=allow
 netsh advfirewall firewall add rule name="StreamTimer WS" protocol=TCP dir=in localport=8765 action=allow
 ```
 
-**What you can control from the remote:**
-- Start, pause, reset
-- Set time and start immediately
+### What the remote controls
+
+- Start / Pause / Reset / Toggle
+- Set time + start immediately
 - Switch mode, skin, finish effect, background effect
 - Change label and finish text
+- Spotify widget (track, artist, cover, spin, show/hide)
+- Ticker (messages, speed, show/hide)
 - Video on/off, restart, next track
-- Live timer display on the tablet
-
----
-
-## License
-
-MIT
+- Live timer display on tablet
 
 ---
 
 ## Security
 
-Both `stream_timer.html` and `server.py` have been scanned and are clean.
+Scanned and clean:
 
 - VirusTotal: https://www.virustotal.com/gui/file/663fc2dedcde30b98254e0a5ce616acd4f06e9286e5e7e575eb6f02346f54d20
 - Hybrid Analysis: https://hybrid-analysis.com/sample/663fc2dedcde30b98254e0a5ce616acd4f06e9286e5e7e575eb6f02346f54d20
 
-The source code is fully open — read every line yourself if you want.
+Source code is fully open — read every line yourself.
+
+---
+
+## Changelog
+
+### v2.0.1
+- Added "Until Time" countdown mode
+- Fixed remote control WebSocket connection issues
+- Fixed HTTP server stability
+- Auto-fill WebSocket URL on remote page
+- Removed all code comments
+
+### v2.0.0
+- Remote control system (WebSocket + HTTP server)
+- Spotify Now Playing widget
+- News ticker
+- DE/EN language toggle
+- Video playlist with loop/shuffle
+- GIF background support
+- Animated border effects
+- 5 timer skins
+- Timer size, glow, shadow customization
+- 4 additional timer modes (Stopwatch, Loop, Clock, Until Time)
+- 13 finish effects
+- 13 background effects
+
+### v1.0.0
+- Initial release
+
+---
+
+## License
+
+MIT — free to use, modify and share.
